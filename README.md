@@ -3,11 +3,11 @@
 > **DrtMind** é uma ferramenta de pensamento em rede (networked thought) projetada para funcionar como um "segundo cérebro". Desenvolvida para transformar notas isoladas em um ecossistema de conhecimento interconectado.
 
 <p align="center">
-<img src="[https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB]" alt="React" />
-<img src="[https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript](https://www.google.com/search?q=https://img.shields.io/badge/TypeScript-5.8-blue%3Flogo%3Dtypescript)" alt="TypeScript" />
-<img src="[https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwind-css](https://www.google.com/search?q=https://img.shields.io/badge/Tailwind-3.4-38B2AC%3Flogo%3Dtailwind-css)" alt="Tailwind CSS" />
-<img src="[https://img.shields.io/badge/Supabase-Backend-green?logo=supabase](https://www.google.com/search?q=https://img.shields.io/badge/Supabase-Backend-green%3Flogo%3Dsupabase)" alt="Supabase" />
-<img src="[https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite](https://www.google.com/search?q=https://img.shields.io/badge/Vite-5.4-646CFF%3Flogo%3Dvite)" alt="Vite" />
+<img alt="Static Badge" src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB">
+<img alt="Static Badge" src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white">
+<img alt="Static Badge" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white">
+<img alt="Static Badge" src="https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=white">
+<img alt="Static Badge" src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=white">
 </p>
 
 ---
