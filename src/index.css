@@ -170,19 +170,19 @@ All colors MUST be HSL.
 
 /* Markdown Preview Styles */
 .markdown-preview h1 {
-  @apply text-2xl font-bold mb-4 mt-6 first:mt-0 border-b-2 border-border pb-2;
+  @apply text-2xl font-bold mb-2 mt-4 first:mt-0 border-b-2 border-border pb-1;
 }
 
 .markdown-preview h2 {
-  @apply text-xl font-bold mb-3 mt-5;
+  @apply text-xl font-bold mb-1.5 mt-3;
 }
 
 .markdown-preview h3 {
-  @apply text-lg font-bold mb-2 mt-4;
+  @apply text-lg font-bold mb-1 mt-2;
 }
 
 .markdown-preview p {
-  @apply mb-3 leading-relaxed;
+  @apply mb-2 leading-relaxed;
 }
 
 .markdown-preview strong {
@@ -202,7 +202,7 @@ All colors MUST be HSL.
 }
 
 .markdown-preview pre {
-  @apply bg-muted p-4 overflow-x-auto mb-4 border-2 border-border;
+  @apply bg-muted p-4 overflow-x-auto mb-2 border-2 border-border;
 }
 
 .markdown-preview pre code {
@@ -210,11 +210,11 @@ All colors MUST be HSL.
 }
 
 .markdown-preview ul {
-  @apply list-disc list-inside mb-4 space-y-1;
+  @apply list-disc list-inside mb-2 space-y-0;
 }
 
 .markdown-preview li {
-  @apply leading-relaxed;
+  @apply leading-normal;
 }
 
 .markdown-preview blockquote {
