@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Menu, Network, FileText, LogOut, Loader2, Plus, X } from 'lucide-react';
+import { Menu, Network, FileText, LogOut, Loader2, Plus, X, Crown } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -198,6 +198,15 @@ const Index = () => {
             <span className="text-xs sm:text-sm text-muted-foreground hidden md:block">
               {notes.length} notas • {links.length} conexões
             </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/pricing')}
+              className="border-2 h-9 w-9 p-0 sm:h-auto sm:w-auto sm:px-3"
+            >
+              <Crown className="w-4 h-4" />
+              <span className="hidden sm:inline ml-2">Planos</span>
+            </Button>
             <ThemeToggle />
             <Button
               variant="outline"
