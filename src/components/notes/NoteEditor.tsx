@@ -2,16 +2,17 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Note } from '@/types/note';
 import { MarkdownPreview } from './MarkdownPreview';
 import { Button } from '@/components/ui/button';
-import { Eye, Edit3, Trash2 } from 'lucide-react';
+import { Eye, Edit3, Trash2, ArrowLeft } from 'lucide-react';
 
 interface NoteEditorProps {
   note: Note;
   onUpdate: (id: string, updates: Partial<Pick<Note, 'title' | 'content'>>) => void;
   onDelete: (id: string) => void;
   onLinkClick: (title: string) => void;
+  onBackToGraph?: () => void;
 }
 
-export const NoteEditor = ({ note, onUpdate, onDelete, onLinkClick }: NoteEditorProps) => {
+export const NoteEditor = ({ note, onUpdate, onDelete, onLinkClick, onBackToGraph }: NoteEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localTitle, setLocalTitle] = useState(note.title);
   const [localContent, setLocalContent] = useState(note.content);
