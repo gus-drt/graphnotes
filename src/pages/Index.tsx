@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotes } from '@/hooks/useNotesDb';
+import { useTags } from '@/hooks/useTags';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipe } from '@/hooks/useSwipe';
 import { NoteList } from '@/components/notes/NoteList';
@@ -35,6 +36,8 @@ const Index = () => {
     navigateToNote,
     loading: notesLoading,
   } = useNotes();
+
+  const { tags, createTag, addTagToNote, removeTagFromNote, getTagsForNote } = useTags();
 
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [activeView, setActiveView] = useState<'editor' | 'graph'>('editor');
@@ -116,6 +119,7 @@ const Index = () => {
       onTogglePin={togglePinNote}
       pinnedCount={pinnedCount}
       loading={notesLoading}
+      getTagsForNote={getTagsForNote}
     />
   );
 
@@ -258,6 +262,11 @@ const Index = () => {
                     onDelete={deleteNote}
                     onLinkClick={navigateToNote}
                     onBackToGraph={cameFromGraph ? handleBackToGraph : undefined}
+                    allTags={tags}
+                    noteTags={selectedNote ? getTagsForNote(selectedNote.id) : []}
+                    onAddTag={(tagId) => selectedNote && addTagToNote(selectedNote.id, tagId)}
+                    onRemoveTag={(tagId) => selectedNote && removeTagFromNote(selectedNote.id, tagId)}
+                    onCreateTag={createTag}
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">

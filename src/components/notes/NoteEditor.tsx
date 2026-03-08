@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Note } from '@/types/note';
+import { Tag } from '@/hooks/useTags';
 import { MarkdownPreview } from './MarkdownPreview';
+import { TagSelector } from './TagSelector';
 import { Button } from '@/components/ui/button';
 import { Eye, Edit3, Trash2, ArrowLeft } from 'lucide-react';
 
@@ -10,9 +12,14 @@ interface NoteEditorProps {
   onDelete: (id: string) => void;
   onLinkClick: (title: string) => void;
   onBackToGraph?: () => void;
+  allTags: Tag[];
+  noteTags: Tag[];
+  onAddTag: (tagId: string) => void;
+  onRemoveTag: (tagId: string) => void;
+  onCreateTag: (name: string, color: string) => Promise<Tag | null>;
 }
 
-export const NoteEditor = ({ note, onUpdate, onDelete, onLinkClick, onBackToGraph }: NoteEditorProps) => {
+export const NoteEditor = ({ note, onUpdate, onDelete, onLinkClick, onBackToGraph, allTags, noteTags, onAddTag, onRemoveTag, onCreateTag }: NoteEditorProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localTitle, setLocalTitle] = useState(note.title);
   const [localContent, setLocalContent] = useState(note.content);
@@ -108,6 +115,17 @@ export const NoteEditor = ({ note, onUpdate, onDelete, onLinkClick, onBackToGrap
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
+      </div>
+
+      {/* Tags */}
+      <div className="px-2 sm:px-4 py-1.5 border-b border-border">
+        <TagSelector
+          allTags={allTags}
+          noteTags={noteTags}
+          onAddTag={onAddTag}
+          onRemoveTag={onRemoveTag}
+          onCreateTag={onCreateTag}
+        />
       </div>
 
       {/* Content */}
