@@ -119,6 +119,7 @@ const Index = () => {
       onTogglePin={togglePinNote}
       pinnedCount={pinnedCount}
       loading={notesLoading}
+      getTagsForNote={getTagsForNote}
     />
   );
 
