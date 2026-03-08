@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotes } from '@/hooks/useNotesDb';
+import { useTags } from '@/hooks/useTags';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipe } from '@/hooks/useSwipe';
 import { NoteList } from '@/components/notes/NoteList';
