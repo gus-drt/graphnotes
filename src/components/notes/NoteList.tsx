@@ -1,4 +1,5 @@
 import { Note } from '@/types/note';
+import { Tag } from '@/hooks/useTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, FileText, Loader2, Pin } from 'lucide-react';
