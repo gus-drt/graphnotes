@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Menu, Network, FileText, LogOut, Loader2, Plus, X, Crown } from 'lucide-react';
+import { Menu, Network, FileText, LogOut, Loader2, Plus, X, Crown, Settings } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
