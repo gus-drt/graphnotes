@@ -38,6 +38,7 @@ const Index = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [activeView, setActiveView] = useState<'editor' | 'graph'>('editor');
+  const [cameFromGraph, setCameFromGraph] = useState(false);
 
   // Swipe gestures for opening/closing sidebar
   const openSidebar = useCallback(() => setSidebarOpen(true), []);
