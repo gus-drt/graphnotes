@@ -56,12 +56,18 @@ const Index = () => {
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);
     if (activeView === 'graph') {
+      setCameFromGraph(true);
       setActiveView('editor');
     }
     if (isMobile) {
       setSidebarOpen(false);
     }
   };
+
+  const handleBackToGraph = useCallback(() => {
+    setCameFromGraph(false);
+    setActiveView('graph');
+  }, []);
 
   // Redirect to auth if not logged in
   useEffect(() => {
