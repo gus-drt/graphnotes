@@ -261,6 +261,11 @@ const Index = () => {
                     onDelete={deleteNote}
                     onLinkClick={navigateToNote}
                     onBackToGraph={cameFromGraph ? handleBackToGraph : undefined}
+                    allTags={tags}
+                    noteTags={selectedNote ? getTagsForNote(selectedNote.id) : []}
+                    onAddTag={(tagId) => selectedNote && addTagToNote(selectedNote.id, tagId)}
+                    onRemoveTag={(tagId) => selectedNote && removeTagFromNote(selectedNote.id, tagId)}
+                    onCreateTag={createTag}
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
