@@ -1,4 +1,5 @@
 import { Note } from '@/types/note';
+import { Tag } from '@/hooks/useTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Search, FileText, Loader2, Pin } from 'lucide-react';
@@ -13,6 +14,7 @@ interface NoteListProps {
   onTogglePin: (id: string) => void;
   pinnedCount: number;
   loading?: boolean;
+  getTagsForNote: (noteId: string) => Tag[];
 }
 
 export const NoteList = ({
@@ -25,6 +27,7 @@ export const NoteList = ({
   onTogglePin,
   pinnedCount,
   loading = false,
+  getTagsForNote,
 }: NoteListProps) => {
   return (
     <div className="flex flex-col h-full">
@@ -98,6 +101,22 @@ export const NoteList = ({
                             🔗 {note.linkedNotes.length} conexão(ões)
                           </p>
                         )}
+                        {(() => {
+                          const noteTags = getTagsForNote(note.id);
+                          return noteTags.length > 0 ? (
+                            <div className="flex gap-1 flex-wrap mt-1">
+                              {noteTags.map(tag => (
+                                <span
+                                  key={tag.id}
+                                  className="text-[10px] px-1.5 py-0 rounded-full text-white font-medium leading-4"
+                                  style={{ backgroundColor: tag.color }}
+                                >
+                                  {tag.name}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null;
+                        })()}
                       </div>
                     </div>
                   </button>
