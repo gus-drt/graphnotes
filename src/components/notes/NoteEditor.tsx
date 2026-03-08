@@ -117,6 +117,17 @@ export const NoteEditor = ({ note, onUpdate, onDelete, onLinkClick, onBackToGrap
         </div>
       </div>
 
+      {/* Tags */}
+      <div className="px-2 sm:px-4 py-1.5 border-b border-border">
+        <TagSelector
+          allTags={allTags}
+          noteTags={noteTags}
+          onAddTag={onAddTag}
+          onRemoveTag={onRemoveTag}
+          onCreateTag={onCreateTag}
+        />
+      </div>
+
       {/* Content */}
       <div className="flex-1 overflow-auto p-2 sm:p-4">
         {isEditing ? (
