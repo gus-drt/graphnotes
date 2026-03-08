@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Note } from '@/types/note';
+import { Tag } from '@/hooks/useTags';
 import { MarkdownPreview } from './MarkdownPreview';
+import { TagSelector } from './TagSelector';
 import { Button } from '@/components/ui/button';
 import { Eye, Edit3, Trash2, ArrowLeft } from 'lucide-react';
 
