@@ -1,0 +1,206 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { ArrowLeft, Trash2, Loader2, User, Shield } from 'lucide-react';
+import { toast } from 'sonner';
+
+const Settings = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const [deleting, setDeleting] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
+
+  const handleDeleteAccount = async () => {
+    if (confirmText !== 'EXCLUIR') return;
+
+    setDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Sessão expirada. Faça login novamente.');
+        navigate('/auth');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('delete-account', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        await signOut();
+        toast.success('Conta excluída com sucesso.');
+        navigate('/auth');
+      } else {
+        throw new Error(data?.error || 'Erro ao excluir conta');
+      }
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast.error(error.message || 'Erro ao excluir conta. Tente novamente.');
+    } finally {
+      setDeleting(false);
+      setConfirmText('');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b-2 border-border bg-card p-3 sm:p-4">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/')}
+            className="border-2 h-9 w-9 p-0 sm:h-auto sm:w-auto sm:px-3"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline ml-2">Voltar</span>
+          </Button>
+          <h1 className="text-lg font-bold flex-1">Configurações</h1>
+          <ThemeToggle />
+        </div>
+      </header>
+
+      <main className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
+        {/* Account Info */}
+        <Card className="border-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Conta
+            </CardTitle>
+            <CardDescription>Informações da sua conta</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <p className="text-sm text-muted-foreground">E-mail</p>
+              <p className="font-medium">{user.email}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Conta criada em</p>
+              <p className="font-medium">
+                {new Date(user.created_at).toLocaleDateString('pt-BR', {
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Danger Zone */}
+        <Card className="border-2 border-destructive/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <Shield className="w-5 h-5" />
+              Zona de Perigo
+            </CardTitle>
+            <CardDescription>
+              Ações irreversíveis que afetam sua conta permanentemente
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Separator className="mb-4" />
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-sm">Excluir conta</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Ao excluir sua conta, todas as suas notas, tags e dados serão
+                  permanentemente removidos. Esta ação não pode ser desfeita.
+                </p>
+              </div>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" className="gap-2">
+                    <Trash2 className="w-4 h-4" />
+                    Excluir minha conta
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-3">
+                      <span className="block">
+                        Esta ação é <strong>permanente e irreversível</strong>. Todos os
+                        seus dados serão excluídos:
+                      </span>
+                      <span className="block">
+                        • Todas as suas notas{'\n'}
+                        • Todas as tags{'\n'}
+                        • Conexões entre notas{'\n'}
+                        • Dados da conta
+                      </span>
+                      <span className="block mt-3">
+                        Digite <strong>EXCLUIR</strong> para confirmar:
+                      </span>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <input
+                    type="text"
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                    placeholder="Digite EXCLUIR"
+                    className="w-full px-3 py-2 border-2 border-border bg-background text-foreground rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-destructive/50"
+                  />
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setConfirmText('')}>
+                      Cancelar
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      disabled={confirmText !== 'EXCLUIR' || deleting}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {deleting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Excluindo...
+                        </>
+                      ) : (
+                        'Excluir permanentemente'
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+};
+
+export default Settings;
