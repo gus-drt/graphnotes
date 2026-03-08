@@ -101,6 +101,22 @@ export const NoteList = ({
                             🔗 {note.linkedNotes.length} conexão(ões)
                           </p>
                         )}
+                        {(() => {
+                          const noteTags = getTagsForNote(note.id);
+                          return noteTags.length > 0 ? (
+                            <div className="flex gap-1 flex-wrap mt-1">
+                              {noteTags.map(tag => (
+                                <span
+                                  key={tag.id}
+                                  className="text-[10px] px-1.5 py-0 rounded-full text-white font-medium leading-4"
+                                  style={{ backgroundColor: tag.color }}
+                                >
+                                  {tag.name}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null;
+                        })()}
                       </div>
                     </div>
                   </button>
