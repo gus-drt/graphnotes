@@ -197,13 +197,14 @@ const Index = () => {
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 translate-x-8 pointer-events-none'
               }`}
-              style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
+              style={{ bottom: bottomBarHeight > 0 ? `${bottomBarHeight + 16}px` : 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
             >
               <NoteGraph
                 notes={notes}
                 links={links}
                 selectedNoteId={selectedNoteId}
                 onSelectNote={handleSelectNote}
+                isActive={activeView === 'graph'}
               />
             </div>
           </>
