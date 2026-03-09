@@ -5,7 +5,6 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { PLANS, type PlanKey } from "@/config/plans";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -69,18 +68,20 @@ const Pricing = () => {
   return (
     <div className="min-h-[100dvh] bg-background">
       {/* Header */}
-      <header className="flex items-center justify-between p-3 sm:p-4 border-b-2 border-border bg-card">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/")}
-          className="border-2 gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Voltar</span>
-        </Button>
-        <h1 className="text-lg font-bold">Planos</h1>
-        <ThemeToggle />
+      <header className="glass border-b border-border/50 p-3 sm:p-4 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/")}
+            className="gap-2 rounded-xl"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Voltar</span>
+          </Button>
+          <h1 className="text-lg font-semibold">Planos</h1>
+          <div className="w-20" /> {/* Spacer for centering */}
+        </div>
       </header>
 
       {/* Content */}
@@ -103,14 +104,14 @@ const Pricing = () => {
               return (
                 <div
                   key={key}
-                  className={`relative border-2 p-5 sm:p-6 bg-card flex flex-col overflow-visible ${
+                  className={`relative rounded-2xl p-5 sm:p-6 bg-card flex flex-col overflow-visible shadow-sm transition-all ${
                     isPopular
-                      ? "border-primary shadow-md"
-                      : "border-border"
+                      ? "ring-2 ring-primary shadow-md"
+                      : "border border-border/50"
                   } ${isCurrentPlan ? "ring-2 ring-primary" : ""}`}
                 >
                   {isPopular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 rounded-full">
                       Popular
                     </Badge>
                   )}
@@ -118,7 +119,7 @@ const Pricing = () => {
                   {isCurrentPlan && (
                     <Badge
                       variant="outline"
-                      className="absolute -top-3 right-3 border-primary text-primary z-10 bg-card"
+                      className="absolute -top-3 right-3 border-primary text-primary z-10 bg-card rounded-full"
                     >
                       Seu plano
                     </Badge>
@@ -126,7 +127,7 @@ const Pricing = () => {
 
                   <div className="flex items-center gap-2 mb-2">
                     {planIcons[key]}
-                    <h3 className="text-lg font-bold">{plan.name}</h3>
+                    <h3 className="text-lg font-semibold">{plan.name}</h3>
                   </div>
 
                   <p className="text-sm text-muted-foreground mb-4">
@@ -159,25 +160,25 @@ const Pricing = () => {
                   </ul>
 
                   {"comingSoon" in plan && plan.comingSoon ? (
-                    <Button variant="outline" className="w-full border-2" disabled>
+                    <Button variant="outline" className="w-full rounded-xl" disabled>
                       Em breve
                     </Button>
                   ) : isCurrentPlan && subscribed ? (
                     <Button
                       variant="outline"
-                      className="w-full border-2 gap-2"
+                      className="w-full rounded-xl gap-2"
                       onClick={handleManage}
                     >
                       <Settings className="w-4 h-4" />
                       Gerenciar
                     </Button>
                   ) : isCurrentPlan && !subscribed ? (
-                    <Button variant="outline" className="w-full border-2" disabled>
+                    <Button variant="outline" className="w-full rounded-xl" disabled>
                       Plano atual
                     </Button>
                   ) : plan.price_id ? (
                     <Button
-                      className="w-full border-2"
+                      className="w-full rounded-xl"
                       variant={isPopular ? "default" : "outline"}
                       disabled={checkoutLoading !== null}
                       onClick={() => handleCheckout(key)}
@@ -189,7 +190,7 @@ const Pricing = () => {
                       )}
                     </Button>
                   ) : (
-                    <Button variant="outline" className="w-full border-2" disabled>
+                    <Button variant="outline" className="w-full rounded-xl" disabled>
                       Plano atual
                     </Button>
                   )}

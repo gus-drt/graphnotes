@@ -35,64 +35,49 @@ All colors MUST be HSL.
     --destructive: 0 84% 60%;
     --destructive-foreground: 40 20% 96%;
 
-    --border: 30 5% 10%;
-    --input: 30 5% 10%;
+    --border: 30 10% 80%;
+    --input: 30 10% 80%;
     --ring: 30 5% 10%;
 
-    --radius: 0rem;
+    --radius: 1rem;
 
     --sidebar-background: 40 18% 94%;
-
     --sidebar-foreground: 30 5% 10%;
-
     --sidebar-primary: 30 5% 10%;
-
     --sidebar-primary-foreground: 40 20% 96%;
-
     --sidebar-accent: 40 12% 88%;
-
     --sidebar-accent-foreground: 30 5% 10%;
-
-    --sidebar-border: 30 5% 10%;
-
+    --sidebar-border: 30 10% 80%;
     --sidebar-ring: 30 5% 10%;
 
     --chart-1: 12 76% 61%;
-
     --chart-2: 173 58% 39%;
-
     --chart-3: 197 37% 24%;
-
     --chart-4: 43 74% 66%;
-
     --chart-5: 27 87% 67%;
 
     --sidebar: 40 18% 94%;
 
     --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-
     --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
-    --shadow-2xs: 1px 1px 0px 0px hsl(30 5% 10%);
+    /* Modern shadows with blur */
+    --shadow-2xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-xs: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.07);
+    --shadow-md: 0 6px 10px -2px rgba(0, 0, 0, 0.08), 0 3px 6px -3px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 
-    --shadow-xs: 2px 2px 0px 0px hsl(30 5% 10%);
-
-    --shadow-sm: 3px 3px 0px 0px hsl(30 5% 10%);
-
-    --shadow: 5px 5px 0px 0px hsl(30 5% 10%);
-
-    --shadow-md: 8px 8px 0px 0px hsl(30 5% 10%);
-
-    --shadow-lg: 12px 12px 0px 0px hsl(30 5% 10%);
-
-    --shadow-xl: 16px 16px 0px 0px hsl(30 5% 10%);
-
-    --shadow-2xl: 24px 24px 0px 0px hsl(30 5% 10%);
+    /* Glassmorphism tokens */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
     --tracking-normal: 0em;
-
     --spacing: 0.25rem;
   }
 
@@ -121,32 +106,42 @@ All colors MUST be HSL.
     --destructive: 0 62% 30%;
     --destructive-foreground: 40 15% 90%;
 
-    --border: 40 15% 90%;
-    --input: 40 15% 90%;
+    --border: 30 5% 20%;
+    --input: 30 5% 20%;
     --ring: 40 15% 90%;
+    
     --sidebar-background: 30 5% 10%;
     --sidebar-foreground: 40 15% 90%;
     --sidebar-primary: 40 15% 90%;
     --sidebar-primary-foreground: 30 5% 8%;
     --sidebar-accent: 30 5% 18%;
     --sidebar-accent-foreground: 40 15% 90%;
-    --sidebar-border: 40 15% 90%;
+    --sidebar-border: 30 5% 20%;
     --sidebar-ring: 40 15% 90%;
+    
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
     --sidebar: 30 5% 10%;
-    --radius: 0rem;
-    --shadow-2xs: 1px 1px 0px 0px hsl(40 15% 90%);
-    --shadow-xs: 2px 2px 0px 0px hsl(40 15% 90%);
-    --shadow-sm: 3px 3px 0px 0px hsl(40 15% 90%);
-    --shadow: 5px 5px 0px 0px hsl(40 15% 90%);
-    --shadow-md: 8px 8px 0px 0px hsl(40 15% 90%);
-    --shadow-lg: 12px 12px 0px 0px hsl(40 15% 90%);
-    --shadow-xl: 16px 16px 0px 0px hsl(40 15% 90%);
-    --shadow-2xl: 24px 24px 0px 0px hsl(40 15% 90%);
+    --radius: 1rem;
+
+    /* Dark mode shadows */
+    --shadow-2xs: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --shadow-xs: 0 1px 3px 0 rgba(0, 0, 0, 0.25), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.3), 0 1px 3px -1px rgba(0, 0, 0, 0.3);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 6px 10px -2px rgba(0, 0, 0, 0.4), 0 3px 6px -3px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.45), 0 4px 6px -4px rgba(0, 0, 0, 0.45);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+
+    /* Dark glassmorphism tokens */
+    --glass-bg: rgba(30, 30, 30, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -157,20 +152,45 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-sans;
-    transition: background-color 0.5s ease, color 0.5s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Smooth theme transitions */
   *,
   *::before,
   *::after {
-    transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, fill 0.5s ease, stroke 0.5s ease, box-shadow 0.5s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+}
+
+/* Glassmorphism utility classes */
+@layer components {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-heavy {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-subtle {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 }
 
 /* Markdown Preview Styles */
 .markdown-preview h1 {
-  @apply text-2xl font-bold mb-2 mt-4 first:mt-0 border-b-2 border-border pb-1;
+  @apply text-2xl font-bold mb-2 mt-4 first:mt-0 border-b border-border pb-1;
 }
 
 .markdown-preview h2 {
@@ -198,15 +218,15 @@ All colors MUST be HSL.
 }
 
 .markdown-preview code {
-  @apply bg-muted px-1.5 py-0.5 font-mono text-sm border border-border;
+  @apply bg-muted px-1.5 py-0.5 font-mono text-sm rounded;
 }
 
 .markdown-preview pre {
-  @apply bg-muted p-4 overflow-x-auto mb-2 border-2 border-border;
+  @apply bg-muted p-4 overflow-x-auto mb-2 rounded-lg;
 }
 
 .markdown-preview pre code {
-  @apply bg-transparent p-0 border-none;
+  @apply bg-transparent p-0;
 }
 
 .markdown-preview ul {
@@ -218,11 +238,11 @@ All colors MUST be HSL.
 }
 
 .markdown-preview blockquote {
-  @apply border-l-4 border-border pl-4 italic text-muted-foreground mb-4;
+  @apply border-l-4 border-border pl-4 italic text-muted-foreground mb-4 rounded-r;
 }
 
 .markdown-preview hr {
-  @apply border-t-2 border-border my-6;
+  @apply border-t border-border my-6;
 }
 
 .markdown-preview a {
@@ -230,5 +250,5 @@ All colors MUST be HSL.
 }
 
 .markdown-preview .note-link {
-  @apply bg-accent px-2 py-0.5 border-2 border-border cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors font-medium;
+  @apply bg-accent px-2 py-0.5 rounded-md cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors font-medium;
 }

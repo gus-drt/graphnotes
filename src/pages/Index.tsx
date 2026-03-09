@@ -9,14 +9,12 @@ import { NoteList } from '@/components/notes/NoteList';
 import { NoteEditor } from '@/components/notes/NoteEditor';
 import { NoteGraph } from '@/components/notes/NoteGraph';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { Menu, Network, FileText, LogOut, Loader2, Plus, X, Crown, Settings } from 'lucide-react';
+import { Menu, Network, FileText, Loader2, Plus, Settings } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const isMobile = useIsMobile();
   
   const {
@@ -39,32 +37,41 @@ const Index = () => {
 
   const { tags, createTag, addTagToNote, removeTagFromNote, getTagsForNote } = useTags();
 
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<'editor' | 'graph'>('editor');
   const [cameFromGraph, setCameFromGraph] = useState(false);
 
-  // Swipe gestures for opening/closing sidebar
-  const openSidebar = useCallback(() => setSidebarOpen(true), []);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
-  
+  // Swipe gestures for switching views
+  const handleSwipeLeft = useCallback(() => {
+    if (!sidebarOpen) {
+      setActiveView('graph');
+    }
+  }, [sidebarOpen]);
+
+  const handleSwipeRight = useCallback(() => {
+    if (!sidebarOpen) {
+      setActiveView('editor');
+    } else {
+      setSidebarOpen(false);
+    }
+  }, [sidebarOpen]);
+
   useSwipe({
-    onSwipeRight: openSidebar,
-    onSwipeLeft: sidebarOpen ? closeSidebar : undefined,
+    onSwipeRight: handleSwipeRight,
+    onSwipeLeft: handleSwipeLeft,
     threshold: 50,
     edgeWidth: 30,
-    edgeOnly: !sidebarOpen, // Only require edge for opening, allow anywhere for closing
+    edgeOnly: false,
   });
 
-  // Close sidebar on mobile when note is selected
+  // Handle note selection
   const handleSelectNote = (id: string) => {
     setSelectedNoteId(id);
     if (activeView === 'graph') {
       setCameFromGraph(true);
       setActiveView('editor');
     }
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
+    setSidebarOpen(false);
   };
 
   const handleBackToGraph = useCallback(() => {
@@ -78,16 +85,6 @@ const Index = () => {
       navigate('/auth');
     }
   }, [user, authLoading, navigate]);
-
-  // Update sidebar state when screen size changes
-  useEffect(() => {
-    setSidebarOpen(!isMobile);
-  }, [isMobile]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
-  };
 
   const links = getLinks();
 
@@ -114,7 +111,7 @@ const Index = () => {
       onSelectNote={handleSelectNote}
       onCreateNote={() => {
         createNote();
-        if (isMobile) setSidebarOpen(false);
+        setSidebarOpen(false);
       }}
       onTogglePin={togglePinNote}
       pinnedCount={pinnedCount}
@@ -124,197 +121,154 @@ const Index = () => {
   );
 
   return (
-    <div className="flex h-[100dvh] bg-background overflow-hidden relative">
-      {/* Desktop Sidebar - Overlay mode with animation */}
-      {!isMobile && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
-              sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
-            onClick={() => setSidebarOpen(false)}
-          />
-          {/* Sidebar */}
-          <aside
-            className={`fixed left-0 top-0 h-full w-72 z-50 border-r-2 border-border bg-sidebar shadow-lg transition-transform duration-300 ease-out ${
-              sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
-          >
-            {/* Close button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-              className="absolute top-3 right-3 h-8 w-8 p-0 z-10"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-            {sidebarContent}
-          </aside>
-        </>
-      )}
-
-      {/* Mobile Sidebar Sheet */}
-      {isMobile && (
-        <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetContent side="left" className="w-[85vw] max-w-sm p-0">
-            {sidebarContent}
-          </SheetContent>
-        </Sheet>
-      )}
-
-      {/* Main content */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Toolbar */}
-        <header className="flex items-center justify-between p-2 sm:p-3 border-b-2 border-border bg-card gap-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="border-2 h-9 w-9 p-0 sm:h-auto sm:w-auto sm:px-3"
-            >
-              <Menu className="w-4 h-4" />
-            </Button>
-            
-            {/* Quick create on mobile */}
-            {isMobile && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => createNote()}
-                className="border-2 h-9 w-9 p-0"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            )}
+    <div className="flex flex-col h-[100dvh] bg-background overflow-hidden relative">
+      {/* Main content area with padding for bottom bar */}
+      <main className="flex-1 overflow-hidden pb-20">
+        {notesLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="w-8 h-8 animate-spin" />
           </div>
-
-          <Tabs
-            value={activeView}
-            onValueChange={(v) => setActiveView(v as 'editor' | 'graph')}
-            className="flex-shrink-0"
-          >
-            <TabsList className="border-2 border-border h-9">
-              <TabsTrigger value="editor" className="gap-1 sm:gap-2 px-2 sm:px-3 h-7">
-                <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">Editor</span>
-              </TabsTrigger>
-              <TabsTrigger value="graph" className="gap-1 sm:gap-2 px-2 sm:px-3 h-7">
-                <Network className="w-4 h-4" />
-                <span className="hidden sm:inline">Grafo</span>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs sm:text-sm text-muted-foreground hidden md:block">
-              {notes.length} notas • {links.length} conexões
-            </span>
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/pricing')}
-                className="border-2 h-9 w-9 p-0 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400"
-              >
-                <Crown className="w-4 h-4" />
-              </Button>
-              <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-500" />
-              </span>
-            </div>
-            <ThemeToggle />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/settings')}
-              className="border-2 h-9 w-9 p-0 sm:h-auto sm:w-auto sm:px-3"
+        ) : (
+          <>
+            {/* Editor view */}
+            <div
+              className={`absolute inset-0 pb-20 transition-all duration-300 ease-out ${
+                activeView === 'editor'
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 -translate-x-8 pointer-events-none'
+              }`}
             >
-              <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">Config</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSignOut}
-              className="border-2 h-9 w-9 p-0 sm:h-auto sm:w-auto sm:px-3"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">Sair</span>
-            </Button>
-          </div>
-        </header>
-
-        {/* Content area */}
-        <div className="flex-1 overflow-hidden relative">
-          {notesLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="w-8 h-8 animate-spin" />
-            </div>
-          ) : (
-            <>
-              {/* Editor view */}
-              <div
-                className={`absolute inset-0 transition-all duration-300 ease-out ${
-                  activeView === 'editor'
-                    ? 'opacity-100 translate-x-0'
-                    : 'opacity-0 translate-x-[-20px] pointer-events-none'
-                }`}
-              >
-                {selectedNote ? (
-                  <NoteEditor
-                    note={selectedNote}
-                    onUpdate={updateNote}
-                    onDelete={deleteNote}
-                    onLinkClick={navigateToNote}
-                    onBackToGraph={cameFromGraph ? handleBackToGraph : undefined}
-                    allTags={tags}
-                    noteTags={selectedNote ? getTagsForNote(selectedNote.id) : []}
-                    onAddTag={(tagId) => selectedNote && addTagToNote(selectedNote.id, tagId)}
-                    onRemoveTag={(tagId) => selectedNote && removeTagFromNote(selectedNote.id, tagId)}
-                    onCreateTag={createTag}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-border flex items-center justify-center mb-4">
-                      <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
-                    </div>
-                    <h2 className="text-lg sm:text-xl font-bold mb-2">Nenhuma nota selecionada</h2>
-                    <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                      {isMobile ? 'Toque no menu para ver suas notas' : 'Selecione uma nota na barra lateral ou crie uma nova'}
-                    </p>
-                    <Button onClick={() => createNote()} className="border-2" variant="outline">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nova Nota
-                    </Button>
+              {selectedNote ? (
+                <NoteEditor
+                  note={selectedNote}
+                  onUpdate={updateNote}
+                  onDelete={deleteNote}
+                  onLinkClick={navigateToNote}
+                  onBackToGraph={cameFromGraph ? handleBackToGraph : undefined}
+                  allTags={tags}
+                  noteTags={selectedNote ? getTagsForNote(selectedNote.id) : []}
+                  onAddTag={(tagId) => selectedNote && addTagToNote(selectedNote.id, tagId)}
+                  onRemoveTag={(tagId) => selectedNote && removeTagFromNote(selectedNote.id, tagId)}
+                  onCreateTag={createTag}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center p-4 sm:p-8">
+                  <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+                    <FileText className="w-8 h-8 text-muted-foreground" />
                   </div>
-                )}
-              </div>
-
-              {/* Graph view */}
-              <div
-                className={`absolute inset-0 transition-all duration-300 ease-out ${
-                  activeView === 'graph'
-                    ? 'opacity-100 translate-x-0'
-                    : 'opacity-0 translate-x-[20px] pointer-events-none'
-                }`}
-              >
-                <div className="h-full">
-                  <NoteGraph
-                    notes={notes}
-                    links={links}
-                    selectedNoteId={selectedNoteId}
-                    onSelectNote={handleSelectNote}
-                  />
+                  <h2 className="text-xl font-semibold mb-2">Nenhuma nota selecionada</h2>
+                  <p className="text-muted-foreground mb-4 max-w-xs">
+                    Selecione uma nota ou crie uma nova para começar
+                  </p>
+                  <Button 
+                    onClick={() => createNote()} 
+                    className="rounded-full px-6 shadow-md"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nova Nota
+                  </Button>
                 </div>
+              )}
+            </div>
+
+            {/* Graph view */}
+            <div
+              className={`absolute inset-0 pb-20 transition-all duration-300 ease-out ${
+                activeView === 'graph'
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 translate-x-8 pointer-events-none'
+              }`}
+            >
+              <div className="h-full">
+                <NoteGraph
+                  notes={notes}
+                  links={links}
+                  selectedNoteId={selectedNoteId}
+                  onSelectNote={handleSelectNote}
+                />
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </main>
+
+      {/* Mobile/Desktop Sheet for notes list */}
+      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <SheetContent 
+          side={isMobile ? "bottom" : "left"} 
+          className={`p-0 ${isMobile ? 'h-[85vh] rounded-t-2xl' : 'w-80'}`}
+        >
+          {sidebarContent}
+        </SheetContent>
+      </Sheet>
+
+      {/* Floating Bottom Bar */}
+      <nav className="fixed bottom-4 left-4 right-4 z-50">
+        <div className="glass-heavy rounded-2xl px-2 py-2 flex items-center justify-between max-w-md mx-auto">
+          {/* Menu Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(true)}
+            className="h-12 w-12 rounded-xl hover:bg-accent"
+          >
+            <Menu className="w-5 h-5" />
+          </Button>
+
+          {/* Editor Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveView('editor')}
+            className={`h-12 w-12 rounded-xl transition-all ${
+              activeView === 'editor' 
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                : 'hover:bg-accent'
+            }`}
+          >
+            <FileText className="w-5 h-5" />
+          </Button>
+
+          {/* Central FAB - Create Note */}
+          <Button
+            onClick={() => createNote()}
+            className="h-14 w-14 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90 -mt-4"
+          >
+            <Plus className="w-6 h-6" />
+          </Button>
+
+          {/* Graph Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveView('graph')}
+            className={`h-12 w-12 rounded-xl transition-all ${
+              activeView === 'graph' 
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                : 'hover:bg-accent'
+            }`}
+          >
+            <Network className="w-5 h-5" />
+          </Button>
+
+          {/* Settings Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/settings')}
+            className="h-12 w-12 rounded-xl hover:bg-accent"
+          >
+            <Settings className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Stats indicator */}
+        <div className="text-center mt-2">
+          <span className="text-xs text-muted-foreground">
+            {notes.length} notas • {links.length} conexões
+          </span>
+        </div>
+      </nav>
     </div>
   );
 };
