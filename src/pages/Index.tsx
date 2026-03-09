@@ -132,7 +132,7 @@ const Index = () => {
           <>
             {/* Editor view */}
             <div
-              className={`absolute inset-0 pb-20 transition-all duration-300 ease-out ${
+              className={`absolute inset-0 transition-all duration-300 ease-out ${
                 activeView === 'editor'
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 -translate-x-8 pointer-events-none'
