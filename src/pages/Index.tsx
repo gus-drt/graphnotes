@@ -222,7 +222,7 @@ const Index = () => {
       </Sheet>
 
       {/* Floating Bottom Bar */}
-      <nav className="fixed bottom-4 left-4 right-4 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <nav ref={bottomBarRef} className="fixed bottom-4 left-4 right-4 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="glass-heavy rounded-2xl px-2 py-2 flex flex-col items-center max-w-md mx-auto gap-1">
           <div className="flex items-center justify-between w-full">
             {/* Menu Button */}
