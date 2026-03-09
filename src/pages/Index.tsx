@@ -123,7 +123,7 @@ const Index = () => {
   return (
     <div className="flex flex-col h-[100dvh] bg-background overflow-hidden relative">
       {/* Main content area with padding for bottom bar */}
-      <main className="flex-1 overflow-hidden" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
+      <main className="flex-1 overflow-hidden relative">
         {notesLoading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-8 h-8 animate-spin" />
@@ -132,11 +132,12 @@ const Index = () => {
           <>
             {/* Editor view */}
             <div
-              className={`absolute inset-0 transition-all duration-300 ease-out ${
+              className={`absolute inset-x-0 top-0 transition-all duration-300 ease-out ${
                 activeView === 'editor'
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 -translate-x-8 pointer-events-none'
               }`}
+              style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
             >
               {selectedNote ? (
                 <NoteEditor
@@ -173,20 +174,19 @@ const Index = () => {
 
             {/* Graph view */}
             <div
-              className={`absolute inset-0 transition-all duration-300 ease-out ${
+              className={`absolute inset-x-0 top-0 transition-all duration-300 ease-out ${
                 activeView === 'graph'
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 translate-x-8 pointer-events-none'
               }`}
+              style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
             >
-              <div className="h-full">
-                <NoteGraph
-                  notes={notes}
-                  links={links}
-                  selectedNoteId={selectedNoteId}
-                  onSelectNote={handleSelectNote}
-                />
-              </div>
+              <NoteGraph
+                notes={notes}
+                links={links}
+                selectedNoteId={selectedNoteId}
+                onSelectNote={handleSelectNote}
+              />
             </div>
           </>
         )}
@@ -203,68 +203,68 @@ const Index = () => {
       </Sheet>
 
       {/* Floating Bottom Bar */}
-      <nav className="fixed bottom-4 left-4 right-4 z-50">
-        <div className="glass-heavy rounded-2xl px-2 py-2 flex items-center justify-between max-w-md mx-auto">
-          {/* Menu Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarOpen(true)}
-            className="h-12 w-12 rounded-xl hover:bg-accent"
-          >
-            <Menu className="w-5 h-5" />
-          </Button>
+      <nav className="fixed bottom-4 left-4 right-4 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="glass-heavy rounded-2xl px-2 py-2 flex flex-col items-center max-w-md mx-auto gap-1">
+          <div className="flex items-center justify-between w-full">
+            {/* Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(true)}
+              className="h-12 w-12 rounded-xl hover:bg-accent"
+            >
+              <Menu className="w-5 h-5" />
+            </Button>
 
-          {/* Editor Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveView('editor')}
-            className={`h-12 w-12 rounded-xl transition-all ${
-              activeView === 'editor' 
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                : 'hover:bg-accent'
-            }`}
-          >
-            <FileText className="w-5 h-5" />
-          </Button>
+            {/* Editor Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setActiveView('editor')}
+              className={`h-12 w-12 rounded-xl transition-all ${
+                activeView === 'editor' 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                  : 'hover:bg-accent'
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+            </Button>
 
-          {/* Central FAB - Create Note */}
-          <Button
-            onClick={() => createNote()}
-            className="h-12 w-12 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            <Plus className="w-6 h-6" />
-          </Button>
+            {/* Central FAB - Create Note */}
+            <Button
+              onClick={() => createNote()}
+              className="h-12 w-12 rounded-full shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="w-6 h-6" />
+            </Button>
 
-          {/* Graph Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setActiveView('graph')}
-            className={`h-12 w-12 rounded-xl transition-all ${
-              activeView === 'graph' 
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                : 'hover:bg-accent'
-            }`}
-          >
-            <Network className="w-5 h-5" />
-          </Button>
+            {/* Graph Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setActiveView('graph')}
+              className={`h-12 w-12 rounded-xl transition-all ${
+                activeView === 'graph' 
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                  : 'hover:bg-accent'
+              }`}
+            >
+              <Network className="w-5 h-5" />
+            </Button>
 
-          {/* Settings Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/settings')}
-            className="h-12 w-12 rounded-xl hover:bg-accent"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
-        </div>
+            {/* Settings Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/settings')}
+              className="h-12 w-12 rounded-xl hover:bg-accent"
+            >
+              <Settings className="w-5 h-5" />
+            </Button>
+          </div>
 
-        {/* Stats indicator */}
-        <div className="text-center mt-2">
-          <span className="text-xs text-muted-foreground">
+          {/* Stats indicator */}
+          <span className="text-xs text-muted-foreground pb-1">
             {notes.length} notas • {links.length} conexões
           </span>
         </div>
