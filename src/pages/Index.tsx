@@ -123,7 +123,7 @@ const Index = () => {
   return (
     <div className="flex flex-col h-[100dvh] bg-background overflow-hidden relative">
       {/* Main content area with padding for bottom bar */}
-      <main className="flex-1 overflow-hidden pb-20">
+      <main className="flex-1 overflow-hidden" style={{ paddingBottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}>
         {notesLoading ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-8 h-8 animate-spin" />
