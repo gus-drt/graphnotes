@@ -91,15 +91,15 @@ const Auth = () => {
     <div className="min-h-[100dvh] flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Graph Notes</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">Graph Notes</h1>
+          <p className="text-muted-foreground">
             {isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
           </p>
         </div>
 
-        {/* Form */}
-        <div className="border-2 border-border p-4 sm:p-6 bg-card shadow-md">
+        {/* Form Card */}
+        <div className="glass-heavy rounded-2xl p-6 sm:p-8 shadow-lg">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -111,7 +111,7 @@ const Auth = () => {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 border-2 h-11"
+                  className="pl-10 h-11 rounded-xl bg-background/50"
                   disabled={loading}
                 />
               </div>
@@ -130,7 +130,7 @@ const Auth = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 border-2 h-11"
+                  className="pl-10 h-11 rounded-xl bg-background/50"
                   disabled={loading}
                 />
               </div>
@@ -141,7 +141,7 @@ const Auth = () => {
 
             <Button
               type="submit"
-              className="w-full border-2 h-11"
+              className="w-full h-11 rounded-xl"
               disabled={loading}
             >
               {loading ? (
@@ -155,7 +155,7 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="flex items-center gap-3 my-4">
+          <div className="flex items-center gap-3 my-5">
             <Separator className="flex-1" />
             <span className="text-xs text-muted-foreground">ou</span>
             <Separator className="flex-1" />
@@ -164,7 +164,7 @@ const Auth = () => {
           <Button
             type="button"
             variant="outline"
-            className="w-full border-2 h-11 gap-2"
+            className="w-full h-11 rounded-xl gap-2"
             disabled={loading || googleLoading}
             onClick={async () => {
               setGoogleLoading(true);
@@ -217,7 +217,7 @@ const Auth = () => {
         </div>
 
         {/* Features */}
-        <div className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-muted-foreground">
+        <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>✨ Notas conectadas • 📊 Visualização em grafo • 🧠 Feito para TDAH</p>
         </div>
       </div>

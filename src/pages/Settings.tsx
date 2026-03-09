@@ -17,12 +17,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Trash2, Loader2, User, Shield } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, User, Shield, Palette, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTheme } from 'next-themes';
 
 const Settings = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [deleting, setDeleting] = useState(false);
   const [confirmText, setConfirmText] = useState('');
 
@@ -75,27 +77,26 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b-2 border-border bg-card p-3 sm:p-4">
+      <header className="glass border-b border-border/50 p-3 sm:p-4 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => navigate('/')}
-            className="border-2 h-9 w-9 p-0 sm:h-auto sm:w-auto sm:px-3"
+            className="h-9 w-9 p-0 rounded-xl sm:h-auto sm:w-auto sm:px-3"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline ml-2">Voltar</span>
           </Button>
-          <h1 className="text-lg font-bold flex-1">Configurações</h1>
-          <ThemeToggle />
+          <h1 className="text-lg font-semibold flex-1">Configurações</h1>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
         {/* Account Info */}
-        <Card className="border-2">
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <User className="w-5 h-5" />
               Conta
             </CardTitle>
@@ -119,10 +120,49 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        {/* Danger Zone */}
-        <Card className="border-2 border-destructive/30">
+        {/* Appearance */}
+        <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-destructive">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Palette className="w-5 h-5" />
+              Aparência
+            </CardTitle>
+            <CardDescription>Personalize a aparência do app</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">Tema</p>
+                <p className="text-sm text-muted-foreground">
+                  {theme === 'dark' ? 'Modo escuro' : 'Modo claro'}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant={theme === 'light' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTheme('light')}
+                  className="h-9 w-9 p-0 rounded-xl"
+                >
+                  <Sun className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={theme === 'dark' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTheme('dark')}
+                  className="h-9 w-9 p-0 rounded-xl"
+                >
+                  <Moon className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Danger Zone */}
+        <Card className="shadow-sm border-destructive/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base text-destructive">
               <Shield className="w-5 h-5" />
               Zona de Perigo
             </CardTitle>
@@ -134,7 +174,7 @@ const Settings = () => {
             <Separator className="mb-4" />
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-sm">Excluir conta</h3>
+                <h3 className="font-medium text-sm">Excluir conta</h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   Ao excluir sua conta, todas as suas notas, tags e dados serão
                   permanentemente removidos. Esta ação não pode ser desfeita.
@@ -143,12 +183,12 @@ const Settings = () => {
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm" className="gap-2">
+                  <Button variant="destructive" size="sm" className="gap-2 rounded-xl">
                     <Trash2 className="w-4 h-4" />
                     Excluir minha conta
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="rounded-2xl">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
                     <AlertDialogDescription className="space-y-3">
@@ -172,16 +212,16 @@ const Settings = () => {
                     value={confirmText}
                     onChange={(e) => setConfirmText(e.target.value)}
                     placeholder="Digite EXCLUIR"
-                    className="w-full px-3 py-2 border-2 border-border bg-background text-foreground rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-destructive/50"
+                    className="w-full px-3 py-2 bg-muted rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-destructive/50"
                   />
                   <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => setConfirmText('')}>
+                    <AlertDialogCancel onClick={() => setConfirmText('')} className="rounded-xl">
                       Cancelar
                     </AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDeleteAccount}
                       disabled={confirmText !== 'EXCLUIR' || deleting}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
                     >
                       {deleting ? (
                         <>
