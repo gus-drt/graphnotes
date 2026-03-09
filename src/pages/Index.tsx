@@ -40,6 +40,24 @@ const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState<'editor' | 'graph'>('editor');
   const [cameFromGraph, setCameFromGraph] = useState(false);
+  const [bottomBarHeight, setBottomBarHeight] = useState(0);
+  const bottomBarRef = useRef<HTMLElement>(null);
+
+  // Measure bottom bar height dynamically
+  useEffect(() => {
+    const el = bottomBarRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
+        setBottomBarHeight(Math.ceil(h));
+      }
+    });
+    observer.observe(el);
+    // Initial measurement
+    setBottomBarHeight(Math.ceil(el.getBoundingClientRect().height));
+    return () => observer.disconnect();
+  }, []);
 
   // Swipe gestures for switching views
   const handleSwipeLeft = useCallback(() => {
