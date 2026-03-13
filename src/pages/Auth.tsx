@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { lovable } from '@/integrations/lovable/index';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -153,6 +154,30 @@ const Auth = () => {
                 </>
               )}
             </Button>
+
+            {isLogin && (
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!email) {
+                    toast.error('Digite seu email primeiro');
+                    return;
+                  }
+                  try {
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                      redirectTo: `${window.location.origin}/reset-password`,
+                    });
+                    if (error) throw error;
+                    toast.success('Email de recuperação enviado! Verifique sua caixa de entrada.');
+                  } catch (error: any) {
+                    toast.error(error.message || 'Erro ao enviar email de recuperação');
+                  }
+                }}
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              >
+                Esqueceu a senha?
+              </button>
+            )}
           </form>
 
           <div className="flex items-center gap-3 my-5">
