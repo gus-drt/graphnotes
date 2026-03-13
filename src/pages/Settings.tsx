@@ -5,7 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ChangePassword } from '@/components/settings/ChangePassword';
+import { ImportExport } from '@/components/settings/ImportExport';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Trash2, Loader2, User, Shield, Palette, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, User, Shield, Palette, Sun, Moon, Lock, HardDrive } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 
@@ -120,6 +121,20 @@ const Settings = () => {
           </CardContent>
         </Card>
 
+        {/* Security */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Lock className="w-5 h-5" />
+              Segurança
+            </CardTitle>
+            <CardDescription>Altere sua senha de acesso</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChangePassword />
+          </CardContent>
+        </Card>
+
         {/* Appearance */}
         <Card className="shadow-sm">
           <CardHeader>
@@ -156,6 +171,22 @@ const Settings = () => {
                 </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Data - Import/Export */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <HardDrive className="w-5 h-5" />
+              Dados
+            </CardTitle>
+            <CardDescription>
+              Exporte suas notas em Markdown ou importe de outro dispositivo
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ImportExport />
           </CardContent>
         </Card>
 
