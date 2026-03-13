@@ -288,6 +288,7 @@ const Index = () => {
           {/* Stats indicator */}
           <span className="text-xs text-muted-foreground pb-1">
             {notes.length} notas • {links.length} conexões
+            {!useCloud && ` • ☁️ ${cloudNoteCount}/${cloudNoteLimit}`}
           </span>
         </div>
       </nav>
