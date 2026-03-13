@@ -33,6 +33,9 @@ const Index = () => {
     getLinks,
     navigateToNote,
     loading: notesLoading,
+    cloudNoteCount,
+    cloudNoteLimit,
+    useCloud,
   } = useNotes();
 
   const { tags, createTag, addTagToNote, removeTagFromNote, getTagsForNote } = useTags();
