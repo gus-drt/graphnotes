@@ -33,6 +33,9 @@ const Index = () => {
     getLinks,
     navigateToNote,
     loading: notesLoading,
+    cloudNoteCount,
+    cloudNoteLimit,
+    useCloud,
   } = useNotes();
 
   const { tags, createTag, addTagToNote, removeTagFromNote, getTagsForNote } = useTags();
@@ -285,6 +288,7 @@ const Index = () => {
           {/* Stats indicator */}
           <span className="text-xs text-muted-foreground pb-1">
             {notes.length} notas • {links.length} conexões
+            {!useCloud && ` • ☁️ ${cloudNoteCount}/${cloudNoteLimit}`}
           </span>
         </div>
       </nav>

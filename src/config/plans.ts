@@ -6,11 +6,13 @@ export const PLANS = {
     price: 0,
     description: "Para começar a organizar suas ideias",
     features: [
-      "Até 50 notas",
+      "Notas ilimitadas (local)",
+      "Até 20 notas na nuvem",
       "Links bidirecionais",
       "Visualização em grafo",
       "Editor Markdown",
       "Tema claro/escuro",
+      "Exportar/importar notas",
     ],
   },
   pro: {
@@ -20,7 +22,8 @@ export const PLANS = {
     price: 19.9,
     description: "Sem limites para o seu segundo cérebro",
     features: [
-      "Notas ilimitadas",
+      "Notas ilimitadas na nuvem",
+      "Sincronização multi-device",
       "Links bidirecionais",
       "Visualização em grafo",
       "Editor Markdown",
