@@ -97,7 +97,7 @@ export const useNotes = () => {
   const [cloudNoteCount, setCloudNoteCount] = useState(0);
 
   // Debounce timers for cloud saves
-  const saveTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const saveTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const pendingUpdatesRef = useRef<Map<string, Partial<Pick<Note, 'title' | 'content'>>>>(new Map());
 
   useEffect(() => {
