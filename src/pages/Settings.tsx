@@ -47,6 +47,10 @@ const Settings = () => {
 
     setDeleting(true);
     try {
+      if (!supabase) {
+        toast.error('Funcionalidade indisponível no modo offline.');
+        return;
+      }
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Sessão expirada. Faça login novamente.');

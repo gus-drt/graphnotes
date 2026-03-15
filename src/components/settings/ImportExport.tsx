@@ -22,7 +22,7 @@ export const ImportExport = () => {
     try {
       let notesData: any[];
 
-      if (useCloud) {
+      if (useCloud && supabase) {
         const { data, error } = await supabase
           .from('notes')
           .select('*')
@@ -88,7 +88,7 @@ export const ImportExport = () => {
           const data = JSON.parse(text);
           const notes = data.notes || [];
 
-          if (useCloud) {
+          if (useCloud && supabase) {
             for (const n of notes) {
               await supabase.from('notes').insert({
                 user_id: user.id,
@@ -114,7 +114,7 @@ export const ImportExport = () => {
         } else if (file.name.endsWith('.md') || file.name.endsWith('.txt')) {
           const title = file.name.replace(/\.(md|txt)$/, '');
 
-          if (useCloud) {
+          if (useCloud && supabase) {
             await supabase.from('notes').insert({
               user_id: user.id,
               title,

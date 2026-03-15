@@ -164,6 +164,10 @@ const Auth = () => {
                     return;
                   }
                   try {
+                    if (!supabase) {
+                      toast.error('Funcionalidade indisponível no modo offline.');
+                      return;
+                    }
                     const { error } = await supabase.auth.resetPasswordForEmail(email, {
                       redirectTo: `${window.location.origin}/reset-password`,
                     });

@@ -66,7 +66,7 @@ export const useTags = () => {
     if (storageModeLoading) return;
 
     try {
-      if (useCloud) {
+      if (useCloud && supabase) {
         const [tagsRes, noteTagsRes] = await Promise.all([
           supabase.from('tags').select('*').eq('user_id', user.id).order('name'),
           supabase.from('note_tags').select('*'),
@@ -93,7 +93,7 @@ export const useTags = () => {
   const createTag = useCallback(async (name: string, color: string) => {
     if (!user) return null;
 
-    if (useCloud) {
+    if (useCloud && supabase) {
       try {
         const { data, error } = await supabase
           .from('tags')
@@ -126,7 +126,7 @@ export const useTags = () => {
   const deleteTag = useCallback(async (tagId: string) => {
     if (!user) return;
 
-    if (useCloud) {
+    if (useCloud && supabase) {
       try {
         const { error } = await supabase.from('tags').delete().eq('id', tagId);
         if (error) throw error;
@@ -149,7 +149,7 @@ export const useTags = () => {
   const addTagToNote = useCallback(async (noteId: string, tagId: string) => {
     if (!user) return;
 
-    if (useCloud) {
+    if (useCloud && supabase) {
       try {
         const { error } = await supabase
           .from('note_tags')
@@ -175,7 +175,7 @@ export const useTags = () => {
   const removeTagFromNote = useCallback(async (noteId: string, tagId: string) => {
     if (!user) return;
 
-    if (useCloud) {
+    if (useCloud && supabase) {
       try {
         const { error } = await supabase
           .from('note_tags')

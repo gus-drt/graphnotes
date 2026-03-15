@@ -15,6 +15,10 @@ const ResetPassword = () => {
   const [isRecovery, setIsRecovery] = useState(false);
 
   useEffect(() => {
+    if (!supabase) {
+      // Cannot listen for auth events without Supabase
+      return;
+    }
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setIsRecovery(true);
@@ -45,6 +49,10 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
+      if (!supabase) {
+        toast.error('Funcionalidade indisponível no modo offline.');
+        return;
+      }
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 

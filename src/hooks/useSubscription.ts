@@ -26,6 +26,10 @@ export function useSubscription(userEmail: string | undefined) {
     }
 
     try {
+      if (!supabase) {
+        setState((s) => ({ ...s, loading: false }));
+        return;
+      }
       const { data, error } = await supabase.functions.invoke(
         "check-subscription"
       );
@@ -54,6 +58,7 @@ export function useSubscription(userEmail: string | undefined) {
   }, [checkSubscription]);
 
   const createCheckout = async (priceId: string) => {
+    if (!supabase) throw new Error('Supabase is not configured');
     const { data, error } = await supabase.functions.invoke("create-checkout", {
       body: { priceId },
     });
@@ -65,6 +70,7 @@ export function useSubscription(userEmail: string | undefined) {
   };
 
   const openCustomerPortal = async () => {
+    if (!supabase) throw new Error('Supabase is not configured');
     const { data, error } = await supabase.functions.invoke("customer-portal");
 
     if (error) throw error;

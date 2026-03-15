@@ -77,6 +77,11 @@ export async function enqueue(
 // ─── Process Queue ───────────────────────────────────────────
 
 export async function processQueue(userId: string): Promise<{ processed: number; failed: number }> {
+  if (!supabase) {
+    // Cannot process queue without Supabase — ops remain queued for later
+    return { processed: 0, failed: 0 };
+  }
+
   const db = await getDb();
   const allOps = await db.getAllFromIndex('syncQueue', 'by-userId', userId);
   const pending = allOps.filter(op => op.status === 'pending' || op.status === 'failed');
@@ -118,6 +123,8 @@ export async function processQueue(userId: string): Promise<{ processed: number;
 // ─── Execute a single sync operation against Supabase ────────
 
 async function executeSyncOp(op: SyncOperation): Promise<void> {
+  if (!supabase) throw new Error('Supabase is not configured');
+
   switch (op.type) {
     case 'create': {
       const { error } = await supabase.from('notes').upsert({

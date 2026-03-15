@@ -85,7 +85,7 @@ export const useNotes = () => {
 
   // ─── Welcome Notes (Cloud) ────────────────────────────────
   const createWelcomeNotesCloud = useCallback(async () => {
-    if (!user) return;
+    if (!user || !supabase) return;
     try {
       const { data, error } = await supabase
         .from('notes')
@@ -162,6 +162,7 @@ export const useNotes = () => {
         // ── CLOUD MODE ──
         if (isOnline) {
           try {
+            if (!supabase) throw new Error('Supabase not configured');
             const { data, error } = await supabase
               .from('notes')
               .select('*')
@@ -207,6 +208,7 @@ export const useNotes = () => {
         } else if (isOnline) {
           // Try pulling existing cloud notes (migration from paid → free)
           try {
+            if (!supabase) throw new Error('Supabase not configured');
             const { data } = await supabase
               .from('notes')
               .select('*')
@@ -256,7 +258,7 @@ export const useNotes = () => {
     async (id: string, updates: Partial<Pick<Note, 'title' | 'content'>>) => {
       if (!user) return;
 
-      if (isOnline) {
+      if (isOnline && supabase) {
         try {
           const { error } = await supabase
             .from('notes')
@@ -304,7 +306,7 @@ export const useNotes = () => {
 
       // 3. Sync to cloud
       if (useCloud || isOnline) {
-        if (isOnline) {
+        if (isOnline && supabase) {
           try {
             const { error } = await supabase
               .from('notes')
@@ -431,7 +433,7 @@ export const useNotes = () => {
       setNotes(prev => prev.filter(n => n.id !== id));
 
       // 3. Sync deletion to cloud
-      if (isOnline) {
+      if (isOnline && supabase) {
         try {
           const { error } = await supabase
             .from('notes')
@@ -482,7 +484,7 @@ export const useNotes = () => {
       await idbPut(noteToIDB(updatedNote, user.id));
 
       // 3. Sync to cloud
-      if (isOnline) {
+      if (isOnline && supabase) {
         try {
           const { error } = await supabase
             .from('notes')

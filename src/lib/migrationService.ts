@@ -13,6 +13,11 @@ const MIGRATION_FLAG = (uid: string) => `gn_cloud_migration_${uid}`;
  * (they serve as cache for offline-first).
  */
 export async function migrateLocalToCloud(userId: string): Promise<{ migrated: number; errors: number }> {
+  if (!supabase) {
+    console.warn('[Migration] Supabase not configured — cannot migrate to cloud');
+    return { migrated: 0, errors: 0 };
+  }
+
   const localNotes = await getAllNotes(userId);
   if (localNotes.length === 0) return { migrated: 0, errors: 0 };
 
@@ -62,6 +67,11 @@ export async function migrateLocalToCloud(userId: string): Promise<{ migrated: n
  * Used for initial sync or when downgrading from paid to free.
  */
 export async function pullCloudToLocal(userId: string): Promise<{ pulled: number }> {
+  if (!supabase) {
+    console.warn('[Migration] Supabase not configured — cannot pull from cloud');
+    return { pulled: 0 };
+  }
+
   try {
     const { data, error } = await supabase
       .from('notes')

@@ -26,6 +26,10 @@ export const ChangePassword = () => {
 
     setLoading(true);
     try {
+      if (!supabase) {
+        toast.error('Funcionalidade indisponível no modo offline.');
+        return;
+      }
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
 
