@@ -62,15 +62,14 @@ Se a nota ainda não existir, ela será criada automaticamente ao clicar no link
 
 Você pode **fixar até 3 notas** no topo da lista para acesso rápido. Basta clicar no ícone de pin ao lado da nota.
 
-## Planos 👑
+## Sincronização e Nuvem ☁️
 
-O Graph Notes oferece diferentes planos:
+O Graph Notes é gratuito e **Open Source**! Você tem duas formas de usá-lo:
 
-- **Free**: funcionalidades básicas para começar
-- **Pro**: recursos avançados por R$19,90/mês
-- **AI Plus**: inteligência artificial integrada por R$39,90/mês
+1. **Uso Padrão:** Suas primeiras **50 notas** são salvas na nuvem automaticamente e podem ser acessadas de qualquer dispositivo. Após 50 notas, elas são salvas **apenas localmente** (no seu navegador).
+2. **Self-Hosting (Ilimitado):** Como o projeto é de código aberto, você pode fazer um fork no GitHub e conectar seu próprio banco de dados (Supabase) para ter armazenamento em nuvem 100% ilimitado e sob o seu controle!
 
-Toque no ícone 👑 no menu superior para ver os detalhes!
+Saiba mais no [Repositório Oficial no GitHub](https://github.com/gus-drt/graphnotes).
 
 ---
 

@@ -55,27 +55,32 @@ O projeto utiliza o que há de mais moderno no ecossistema Web:
 
 ---
 
-## 💳 Planos
+## 👑 Freemium e Open Source
 
-| Recurso | Free | Pro | AI Plus |
-|---|---|---|---|
-| Notas locais (IndexedDB) | ✅ Ilimitadas | ✅ Ilimitadas | ✅ Ilimitadas |
-| Notas na nuvem | Até 20 | ✅ Ilimitadas | ✅ Ilimitadas |
-| Sincronização multi-device | ❌ | ✅ | ✅ |
-| Suporte prioritário | ❌ | ✅ | ✅ |
-| Recursos de IA (em breve) | ❌ | ❌ | ✅ |
-| Preço | Grátis | R$ 19,90/mês | R$ 39,90/mês |
+O Graph Notes conta com uma modalidade *Freemium* para quem não quer perder tempo configurando um banco de dados:
+
+* **Notas Locais Ilimitadas:** Guarde quantas notas quiser gratuitamente, utilizando o armazenamento do seu navegador (IndexedDB).
+* **Nuvem Limitada a 50 Notas:** As primeiras 50 notas criadas serão sincronizadas com nosso servidor de nuvem para você as acessar de outros dispositivos. Após isso, novas notas são salvas apenas localmente.
+* **Open Source / Ilimitado:** Como o projeto é de código aberto, você sempre pode fazer um **fork do projeto** e apontar as variáveis de ambiente para o _seu próprio_ projeto Supabase. E a melhor parte: é 100% gratuito e não tem limite de notas na nuvem imposto via código.
 
 ---
 
-## 🚀 Como Executar
+## 🚀 Como Executar e Fazer Self-Hosting
 
 ### Pré-requisitos
 
 * Node.js (v18 ou superior) ou [Bun](https://bun.sh/)
-* Uma conta no [Supabase](https://supabase.com/) com um projeto configurado
+* Uma conta no [Supabase](https://supabase.com/)
 
-### Instalação
+### 1. Configuração do Backend (Supabase e Banco de Dados)
+
+Se você for rodar utilizando uma nuvem própria, configure o banco de dados antes:
+
+1. Crie um projeto no Supabase.
+2. É necessário rodar as **Migrations** SQL para criar as tabelas `notes` e `tags`. Para isso, você pode copiar e colar o conteúdo dos arquivos SQL localizados na pasta `supabase/migrations/` diretamente no painel **SQL Editor** do Supabase. A ordem importa: crie a tabela base e logo depois as suas dependências.
+3. Certifique-se de configurar a autenticação via E-mail no Supabase (Authentication > Providers) e desabilitar "Confirm Email" caso não queira usar SMTP de imediato.
+
+### 2. Instalação e Frontend
 
 1. Clone o repositório:
 
@@ -93,13 +98,13 @@ bun install
 ```
 
 3. Configure as variáveis de ambiente:
-Copie o arquivo de exemplo e preencha com as suas chaves do Supabase:
+Copie o arquivo de exemplo e preencha com as chaves do seu projeto Supabase:
 
 ```bash
 cp .env.example .env
 ```
 
-Edite o `.env` com os valores do seu projeto Supabase. Consulte `.env.example` para ver todas as variáveis necessárias.
+Edite o `.env` com as chaves "Project ID", "URL", "Anon Key" e "Publishable Key" (disponíveis nos painéis de *Settings -> API* do Supabase).
 
 4. Inicie o servidor de desenvolvimento:
 
@@ -128,17 +133,16 @@ src/
 │   ├── notes/          # Componentes de notas (editor, lista, grafo, tags)
 │   ├── settings/       # Componentes da página de configurações
 │   └── ui/             # Componentes de UI (Shadcn/UI)
-├── config/             # Configurações de planos de assinatura
 ├── data/               # Dados estáticos (notas de boas-vindas)
-├── hooks/              # Custom hooks (notas, tags, auth, sincronização, assinatura)
+├── hooks/              # Custom hooks (notas, tags, auth, sincronização, storage)
 ├── integrations/       # Configuração e tipos do Supabase
 ├── lib/                # Utilitários (IndexedDB, sync queue, migração)
-├── pages/              # Páginas da aplicação (Index, Auth, Settings, Pricing, ResetPassword)
+├── pages/              # Páginas da aplicação (Index, Auth, Settings, ResetPassword)
 └── types/              # Definições de tipos TypeScript
 
 supabase/
-├── functions/          # Edge Functions (check-subscription, create-checkout, customer-portal, delete-account)
-└── migrations/         # Migrações do banco de dados
+├── functions/          # Edge Functions utilitárias (delete-account)
+└── migrations/         # Migrações do banco de dados PostgreSQL
 ```
 
 ---
