@@ -1,9 +1,8 @@
-import { useNavigate } from 'react-router-dom';
 import { Note } from '@/types/note';
 import { Tag } from '@/hooks/useTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, FileText, Loader2, Pin, Crown } from 'lucide-react';
+import { Plus, Search, FileText, Loader2, Pin } from 'lucide-react';
 
 interface NoteListProps {
   notes: Note[];
@@ -30,25 +29,8 @@ export const NoteList = ({
   loading = false,
   getTagsForNote,
 }: NoteListProps) => {
-  const navigate = useNavigate();
-
   return (
     <div className="flex flex-col h-full bg-background">
-      {/* Pricing Banner */}
-      <button
-        onClick={() => navigate('/pricing')}
-        className="mx-3 mt-3 p-3 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 flex items-center gap-3 hover:from-purple-500/20 hover:to-pink-500/20 transition-colors text-left"
-      >
-        <div className="h-9 w-9 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-          <Crown className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium">Upgrade Pro</p>
-          <p className="text-xs text-muted-foreground truncate">Notas ilimitadas + IA</p>
-        </div>
-        <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">Ver planos →</span>
-      </button>
-
       {/* Header */}
       <div className="p-3 sm:p-4">
         <h2 className="text-lg font-semibold mb-3">Minhas Notas</h2>

@@ -35,6 +35,7 @@ const Index = () => {
     loading: notesLoading,
     cloudNoteCount,
     cloudNoteLimit,
+    isAdmin,
     useCloud,
     isOnline,
     isSyncing,
@@ -142,6 +143,11 @@ const Index = () => {
       getTagsForNote={getTagsForNote}
     />
   );
+
+  // Cloud stats label
+  const cloudLabel = isAdmin
+    ? '☁️ ∞'
+    : `☁️ ${cloudNoteCount}/${cloudNoteLimit}`;
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background overflow-hidden relative">
@@ -290,15 +296,14 @@ const Index = () => {
           {/* Stats indicator */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground pb-1">
             <span>
-              {notes.length} notas • {links.length} conexões
-              {!useCloud && ` • ☁️ ${cloudNoteCount}/${cloudNoteLimit}`}
+              {notes.length} notas • {links.length} conexões • {cloudLabel}
             </span>
             
             {/* Sync Status Badge */}
             {useCloud && (
               <div className="flex items-center border-l border-border pl-2 border-opacity-50">
                 {!isOnline ? (
-                  <span className="flex items-center gap-1 text-destructive" title="Offline - Alterações locais">
+                  <span className="flex items-center gap-1 text-destructive" title="Offline - Alterações salvas localmente">
                     <CloudOff className="w-3 h-3" />
                     <span className="max-sm:hidden">Offline</span>
                   </span>

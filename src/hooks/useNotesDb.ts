@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useStorageMode } from '@/hooks/useStorageMode';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { Note, NoteLink } from '@/types/note';
 import { WELCOME_NOTES_DATA } from '@/data/welcomeNotes';
@@ -16,6 +15,10 @@ import {
   migrateFromLocalStorage,
 } from '@/lib/indexedDb';
 import { enqueue, processQueue } from '@/lib/syncQueue';
+
+// ─── Constants ──────────────────────────────────────────────────
+const ADMIN_EMAIL = 'duartegustavoh@gmail.com';
+const FREE_CLOUD_LIMIT = 50;
 
 // ─── Helpers ────────────────────────────────────────────────────
 
@@ -51,7 +54,6 @@ const idbNoteToNote = (idb: ReturnType<typeof idbToNote>): Note => ({
 
 export const useNotes = () => {
   const { user } = useAuth();
-  const { useCloud, cloudNoteLimit, loading: storageModeLoading } = useStorageMode();
   const { isOnline, isSyncing, triggerSync } = useOnlineStatus(user?.id);
 
   const [notes, setNotes] = useState<Note[]>([]);
@@ -59,6 +61,13 @@ export const useNotes = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [cloudNoteCount, setCloudNoteCount] = useState(0);
+
+  // ─── Derived storage values ──────────────────────────────────
+  const isAdmin = user?.email === ADMIN_EMAIL;
+  const cloudNoteLimit = isAdmin ? Infinity : FREE_CLOUD_LIMIT;
+  const canStoreInCloud = isAdmin || cloudNoteCount < FREE_CLOUD_LIMIT;
+  // "useCloud" means the user has cloud access at all (authenticated + supabase available)
+  const useCloud = !!user && !!supabase;
 
   // Debounce timers for cloud saves
   const saveTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -108,6 +117,7 @@ export const useNotes = () => {
       }
 
       setNotes(created);
+      setCloudNoteCount(created.length);
       const idx = created.find(n => n.title === 'Índice');
       if (idx) setSelectedNoteId(idx.id);
     } catch (error) {
@@ -148,7 +158,6 @@ export const useNotes = () => {
       setLoading(false);
       return;
     }
-    if (storageModeLoading) return;
 
     try {
       // STEP 1: Migrate from localStorage if needed (one-time, safe)
@@ -158,83 +167,68 @@ export const useNotes = () => {
       const localIdbNotes = await idbGetAll(user.id);
       const localNotes = localIdbNotes.map(n => idbNoteToNote(idbToNote(n)));
 
-      if (useCloud) {
-        // ── CLOUD MODE ──
-        if (isOnline) {
-          try {
-            if (!supabase) throw new Error('Supabase not configured');
-            const { data, error } = await supabase
-              .from('notes')
-              .select('*')
-              .eq('user_id', user.id)
-              .order('updated_at', { ascending: false });
+      if (useCloud && isOnline) {
+        // ── CLOUD FETCH ──
+        try {
+          const { data, error } = await supabase!
+            .from('notes')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('updated_at', { ascending: false });
 
-            if (error) throw error;
+          if (error) throw error;
 
-            const cloudNotes = (data || []).map(mapDbNote);
+          const cloudNotes = (data || []).map(mapDbNote);
 
-            if (cloudNotes.length === 0 && localNotes.length === 0) {
+          if (cloudNotes.length === 0 && localNotes.length === 0) {
+            // Brand new user — create welcome notes
+            if (canStoreInCloud) {
               await createWelcomeNotesCloud();
-              return;
+            } else {
+              const welcome = await createWelcomeNotesLocal();
+              setNotes(welcome);
+              autoSelectIndex(welcome);
             }
-
-            // Sync cloud → IndexedDB cache
-            for (const note of cloudNotes) {
-              await idbPut(noteToIDB(note, user.id));
-            }
-
-            setNotes(cloudNotes);
-            setCloudNoteCount(cloudNotes.length);
-            autoSelectIndex(cloudNotes);
-          } catch {
-            // Offline fallback: use IndexedDB data
-            if (localNotes.length > 0) {
-              setNotes(localNotes);
-              autoSelectIndex(localNotes);
-            }
+            setLoading(false);
+            return;
           }
-        } else {
-          // Fully offline — serve from IndexedDB
+
+          // Merge: cloud notes are truth for synced ones, locals for the rest
+          // Build a map of all notes (cloud takes precedence for same id)
+          const noteMap = new Map<string, Note>();
+
+          // First add all local notes
+          for (const note of localNotes) {
+            noteMap.set(note.id, note);
+          }
+
+          // Then overlay cloud notes (they are the source of truth)
+          for (const note of cloudNotes) {
+            noteMap.set(note.id, note);
+          }
+
+          const mergedNotes = Array.from(noteMap.values());
+
+          // Sync cloud → IndexedDB cache
+          for (const note of cloudNotes) {
+            await idbPut(noteToIDB(note, user.id));
+          }
+
+          setNotes(mergedNotes);
+          setCloudNoteCount(cloudNotes.length);
+          autoSelectIndex(mergedNotes);
+        } catch {
+          // Offline fallback: use IndexedDB data
           if (localNotes.length > 0) {
             setNotes(localNotes);
             autoSelectIndex(localNotes);
           }
         }
       } else {
-        // ── LOCAL MODE ──
+        // ── OFFLINE / LOCAL-ONLY ──
         if (localNotes.length > 0) {
           setNotes(localNotes);
           autoSelectIndex(localNotes);
-        } else if (isOnline) {
-          // Try pulling existing cloud notes (migration from paid → free)
-          try {
-            if (!supabase) throw new Error('Supabase not configured');
-            const { data } = await supabase
-              .from('notes')
-              .select('*')
-              .eq('user_id', user.id)
-              .order('updated_at', { ascending: false })
-              .limit(cloudNoteLimit === Infinity ? 1000 : cloudNoteLimit);
-
-            if (data && data.length > 0) {
-              const pulledNotes = data.map(mapDbNote);
-              // Save to IndexedDB
-              for (const note of pulledNotes) {
-                await idbPut(noteToIDB(note, user.id));
-              }
-              setNotes(pulledNotes);
-              setCloudNoteCount(data.length);
-              autoSelectIndex(pulledNotes);
-            } else {
-              const welcome = await createWelcomeNotesLocal();
-              setNotes(welcome);
-              autoSelectIndex(welcome);
-            }
-          } catch {
-            const welcome = await createWelcomeNotesLocal();
-            setNotes(welcome);
-            autoSelectIndex(welcome);
-          }
         } else {
           const welcome = await createWelcomeNotesLocal();
           setNotes(welcome);
@@ -247,7 +241,7 @@ export const useNotes = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, useCloud, storageModeLoading, cloudNoteLimit, isOnline, autoSelectIndex, createWelcomeNotesCloud, createWelcomeNotesLocal]);
+  }, [user, useCloud, isOnline, canStoreInCloud, autoSelectIndex, createWelcomeNotesCloud, createWelcomeNotesLocal]);
 
   useEffect(() => {
     fetchNotes();
@@ -304,8 +298,10 @@ export const useNotes = () => {
       setNotes(prev => [newNote, ...prev]);
       setSelectedNoteId(newNote.id);
 
-      // 3. Sync to cloud
-      if (useCloud || isOnline) {
+      // 3. Sync to cloud (only if under limit or admin)
+      const shouldSyncToCloud = canStoreInCloud && useCloud;
+
+      if (shouldSyncToCloud) {
         if (isOnline && supabase) {
           try {
             const { error } = await supabase
@@ -320,6 +316,7 @@ export const useNotes = () => {
               .single();
 
             if (error) throw error;
+            setCloudNoteCount(prev => prev + 1);
           } catch {
             // Failed — enqueue for later
             await enqueue(newNote.id, user.id, 'create', {
@@ -338,11 +335,16 @@ export const useNotes = () => {
             updatedAt: now.toISOString(),
           });
         }
+      } else if (useCloud && !canStoreInCloud) {
+        toast.info(
+          `Limite de ${FREE_CLOUD_LIMIT} notas na nuvem atingido. Esta nota foi salva localmente.`,
+          { duration: 4000 }
+        );
       }
 
       return newNote;
     },
-    [user, useCloud, isOnline]
+    [user, useCloud, canStoreInCloud, isOnline]
   );
 
   // ─── updateNote ────────────────────────────────────────────
@@ -377,7 +379,7 @@ export const useNotes = () => {
         }
       }
 
-      // 3. Debounced cloud save
+      // 3. Debounced cloud save (only for notes that are already in cloud)
       if (user) {
         const currentPending = pendingUpdatesRef.current.get(id) || {};
         pendingUpdatesRef.current.set(id, { ...currentPending, ...updates });
@@ -441,6 +443,7 @@ export const useNotes = () => {
             .eq('id', id)
             .eq('user_id', user.id);
           if (error) throw error;
+          setCloudNoteCount(prev => Math.max(0, prev - 1));
         } catch {
           await enqueue(id, user.id, 'delete', {});
         }
@@ -599,7 +602,9 @@ export const useNotes = () => {
     loading,
     cloudNoteCount,
     cloudNoteLimit,
+    canStoreInCloud,
     useCloud,
+    isAdmin,
     isOnline,
     isSyncing,
     triggerSync,
