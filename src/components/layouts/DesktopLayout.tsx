@@ -4,6 +4,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useLayoutPreferences } from '@/hooks/useLayoutPreferences';
+import { useIsMediumScreen } from '@/hooks/use-mobile';
 import { useKeyboardShortcuts, formatShortcut } from '@/hooks/useKeyboardShortcuts';
 import { Note, NoteLink } from '@/types/note';
 import { Tag } from '@/hooks/useTags';
@@ -12,6 +13,7 @@ import { toast } from 'sonner';
 // Desktop components
 import { NavigationSidebar } from '@/components/desktop/NavigationSidebar';
 import { NoteListPanel } from '@/components/desktop/NoteListPanel';
+import { UnifiedSidebar } from '@/components/desktop/UnifiedSidebar';
 import { EditorPanel } from '@/components/desktop/EditorPanel';
 import { GraphPanel, GraphPosition } from '@/components/desktop/GraphPanel';
 import { CommandPalette } from '@/components/desktop/CommandPalette';
@@ -84,6 +86,9 @@ export const DesktopLayout = ({
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [shortcutsDialogOpen, setShortcutsDialogOpen] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
+
+  const isMediumScreen = useIsMediumScreen();
+  const isUnifiedLayout = isMediumScreen || preferences.sidebarLayout === 'unified';
 
   // Persist graph position changes
   const handleGraphPositionChange = useCallback((position: GraphPosition) => {
@@ -168,8 +173,52 @@ export const DesktopLayout = ({
           )}
 
           <ResizablePanelGroup direction="horizontal" className="flex-1">
-          {/* Column 1: Navigation Sidebar */}
-          {!preferences.sidebarCollapsed && (
+          {/* Unified Sidebar & Note List (For Medium Screens or User Pref) */}
+          {!preferences.sidebarCollapsed && isUnifiedLayout && (
+            <>
+              <ResizablePanel
+                id="unified-panel"
+                order={1}
+                defaultSize={preferences.navigationWidth + preferences.listPanelWidth}
+                onResize={(size) => updatePreferences({ navigationWidth: size / 2, listPanelWidth: size / 2 })}
+                minSize={25}
+                maxSize={45}
+                className="bg-sidebar"
+              >
+                <UnifiedSidebar
+                  notes={notes}
+                  tags={tags}
+                  pinnedCount={pinnedCount}
+                  selectedNoteId={selectedNoteId}
+                  onSelectNote={handleSelectNote}
+                  onCreateNote={handleCreateNote}
+                  onToggleGraph={handleToggleGraph}
+                  onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+                  onToggleSidebar={toggleSidebar}
+                  showGraph={showGraph}
+                  useCloud={useCloud}
+                  isOnline={isOnline}
+                  isSyncing={isSyncing}
+                  cloudNoteCount={cloudNoteCount}
+                  cloudNoteLimit={cloudNoteLimit}
+                  isAdmin={isAdmin}
+                  linksCount={links.length}
+                  selectedTagId={selectedTagId}
+                  onSelectTag={setSelectedTagId}
+                  displayedNotes={displayedNotes}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  onDeleteNote={handleDeleteNote}
+                  onTogglePin={togglePinNote}
+                  getTagsForNote={getTagsForNote}
+                />
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+            </>
+          )}
+
+          {/* Column 1: Navigation Sidebar (Split Layout) */}
+          {!preferences.sidebarCollapsed && !isUnifiedLayout && (
             <>
               <ResizablePanel
                 id="sidebar-panel"
@@ -206,30 +255,33 @@ export const DesktopLayout = ({
             </>
           )}
 
-          {/* Column 2: Note List */}
-          <ResizablePanel 
-            id="list-panel"
-            order={2}
-            defaultSize={preferences.listPanelWidth} 
-            onResize={(size) => updatePreferences({ listPanelWidth: size })}
-            minSize={15} 
-            maxSize={30}
-          >
-            <NoteListPanel
-              notes={displayedNotes}
-              selectedNoteId={selectedNoteId}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onSelectNote={handleSelectNote}
-              onCreateNote={handleCreateNote}
-              onDeleteNote={handleDeleteNote}
-              onTogglePin={togglePinNote}
-              pinnedCount={pinnedCount}
-              getTagsForNote={getTagsForNote}
-            />
-          </ResizablePanel>
-
-          <ResizableHandle withHandle />
+          {/* Column 2: Note List (Split Layout) */}
+          {!isUnifiedLayout && (
+            <>
+              <ResizablePanel 
+                id="list-panel"
+                order={2}
+                defaultSize={preferences.listPanelWidth} 
+                onResize={(size) => updatePreferences({ listPanelWidth: size })}
+                minSize={15} 
+                maxSize={30}
+              >
+                <NoteListPanel
+                  notes={displayedNotes}
+                  selectedNoteId={selectedNoteId}
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  onSelectNote={handleSelectNote}
+                  onCreateNote={handleCreateNote}
+                  onDeleteNote={handleDeleteNote}
+                  onTogglePin={togglePinNote}
+                  pinnedCount={pinnedCount}
+                  getTagsForNote={getTagsForNote}
+                />
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+            </>
+          )}
 
           {/* Column 3: Editor + Graph */}
           <ResizablePanel 

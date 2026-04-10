@@ -23,6 +23,7 @@ import { ArrowLeft, Trash2, Loader2, User, Shield, Palette, Sun, Moon, Lock, Har
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import { useLayoutPreferences } from '@/hooks/useLayoutPreferences';
+import { useIsMediumScreen } from '@/hooks/use-mobile';
 import {
   Select,
   SelectContent,
@@ -36,6 +37,7 @@ const Settings = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const { preferences, updatePreferences } = useLayoutPreferences();
+  const isMediumScreen = useIsMediumScreen();
   const [deleting, setDeleting] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [tagStyle, setTagStyle] = useState(() => localStorage.getItem('tagDisplayStyle') || 'name');
@@ -219,6 +221,33 @@ const Settings = () => {
             </div>
 
             <Separator />
+
+            {!isMediumScreen && (
+              <>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">Layout da Barra Lateral</p>
+                    <p className="text-sm text-muted-foreground mr-4">
+                      Como dividir o espaço em telas grandes
+                    </p>
+                  </div>
+                  <Select 
+                    value={preferences.sidebarLayout} 
+                    onValueChange={(value: 'split' | 'unified') => updatePreferences({ sidebarLayout: value })}
+                  >
+                    <SelectTrigger className="w-[140px] rounded-xl h-9">
+                      <SelectValue placeholder="Selecione..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="split">Separado</SelectItem>
+                      <SelectItem value="unified">Unificado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Separator />
+              </>
+            )}
 
             <div className="flex items-center justify-between">
               <div>

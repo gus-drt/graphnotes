@@ -18,6 +18,8 @@ export interface LayoutPreferences {
   editorMode: 'edit' | 'preview' | 'split';
   /** Default editor mode when opening a note */
   defaultEditorMode: 'edit' | 'preview' | 'split';
+  /** Display mode for the sidebars on desktop */
+  sidebarLayout: 'split' | 'unified';
   /** Whether to show line numbers in editor */
   showLineNumbers: boolean;
   /** Font size for the editor */
@@ -41,6 +43,7 @@ const DEFAULT_PREFERENCES: LayoutPreferences = {
   floatingGraphSize: { width: 320, height: 240 },
   editorMode: 'split',
   defaultEditorMode: 'preview',
+  sidebarLayout: 'split',
   showLineNumbers: false,
   editorFontSize: 14,
   sidebarSections: {
