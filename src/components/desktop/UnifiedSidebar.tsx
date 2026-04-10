@@ -40,7 +40,7 @@ interface UnifiedSidebarProps {
 }
 
 export const UnifiedSidebar = (props: UnifiedSidebarProps) => {
-  const [activeTab, setActiveTab] = useState<string>('list');
+  const [activeTab, setActiveTab] = useState<string>('menu');
 
   return (
     <div className="h-full flex flex-col bg-background/50 border-r backdrop-blur-sm relative overflow-hidden">
@@ -58,8 +58,8 @@ export const UnifiedSidebar = (props: UnifiedSidebarProps) => {
           </TabsList>
         </div>
 
-        <TabsContent value="menu" className="flex-1 overflow-hidden m-0 data-[state=active]:flex data-[state=active]:flex-col">
-          <div className="flex-1 w-full relative">
+        <TabsContent value="menu" className="flex-1 min-h-0 overflow-hidden m-0 data-[state=active]:flex data-[state=active]:flex-col">
+          <div className="flex-1 flex flex-col w-full relative min-h-0">
             <NavigationSidebar
               notes={props.notes}
               tags={props.tags}
@@ -84,8 +84,8 @@ export const UnifiedSidebar = (props: UnifiedSidebarProps) => {
           </div>
         </TabsContent>
 
-        <TabsContent value="list" className="flex-1 overflow-hidden m-0 data-[state=active]:flex data-[state=active]:flex-col">
-          <div className="flex-1 w-full relative">
+        <TabsContent value="list" className="flex-1 min-h-0 overflow-hidden m-0 data-[state=active]:flex data-[state=active]:flex-col">
+          <div className="flex-1 flex flex-col w-full relative min-h-0">
             <NoteListPanel
               notes={props.displayedNotes}
               selectedNoteId={props.selectedNoteId}

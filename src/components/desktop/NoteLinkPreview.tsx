@@ -46,6 +46,8 @@ export const NoteLinkPreview = ({
 
         // Delay to prevent accidental triggers
         hoverTimeoutRef.current = window.setTimeout(() => {
+          if (!document.body.contains(target)) return;
+
           const note = notes.find(n => 
             n.title.toLowerCase() === title.toLowerCase()
           );

@@ -209,7 +209,7 @@ const Settings = () => {
                 value={preferences.defaultEditorMode} 
                 onValueChange={(value: 'edit' | 'preview' | 'split') => updatePreferences({ defaultEditorMode: value })}
               >
-                <SelectTrigger className="w-[140px] rounded-xl h-9">
+                <SelectTrigger className="w-[180px] rounded-xl h-9">
                   <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -235,7 +235,7 @@ const Settings = () => {
                     value={preferences.sidebarLayout} 
                     onValueChange={(value: 'split' | 'unified') => updatePreferences({ sidebarLayout: value })}
                   >
-                    <SelectTrigger className="w-[140px] rounded-xl h-9">
+                    <SelectTrigger className="w-[160px] rounded-xl h-9">
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
                     <SelectContent>

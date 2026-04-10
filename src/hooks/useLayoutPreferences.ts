@@ -43,7 +43,7 @@ const DEFAULT_PREFERENCES: LayoutPreferences = {
   floatingGraphSize: { width: 320, height: 240 },
   editorMode: 'split',
   defaultEditorMode: 'preview',
-  sidebarLayout: 'split',
+  sidebarLayout: 'unified',
   showLineNumbers: false,
   editorFontSize: 14,
   sidebarSections: {
