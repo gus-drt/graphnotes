@@ -34,6 +34,7 @@ interface DesktopLayoutProps {
   updateNote: (id: string, updates: Partial<Pick<Note, 'title' | 'content'>>) => void;
   deleteNote: (id: string) => void;
   togglePinNote: (id: string) => void;
+  toggleNotePublic: (id: string) => void;
   pinnedCount: number;
   links: NoteLink[];
   navigateToNote: (title: string) => void;
@@ -62,6 +63,7 @@ export const DesktopLayout = ({
   updateNote,
   deleteNote,
   togglePinNote,
+  toggleNotePublic,
   pinnedCount,
   links,
   navigateToNote,
@@ -303,6 +305,9 @@ export const DesktopLayout = ({
                     onAddTag={(tagId) => addTagToNote(selectedNote.id, tagId)}
                     onRemoveTag={(tagId) => removeTagFromNote(selectedNote.id, tagId)}
                     onCreateTag={createTag}
+                    isPublic={selectedNote.isPublic}
+                    onTogglePublic={(id) => toggleNotePublic(id || selectedNote.id)}
+                    linkedNotesData={notes.filter(n => selectedNote.linkedNotes.includes(n.title))}
                     defaultMode={preferences.defaultEditorMode}
                   />
 

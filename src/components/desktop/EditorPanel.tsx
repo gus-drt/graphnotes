@@ -3,6 +3,7 @@ import { Note } from '@/types/note';
 import { Tag } from '@/hooks/useTags';
 import { MarkdownPreview } from '@/components/notes/MarkdownPreview';
 import { TagSelector } from '@/components/notes/TagSelector';
+import { SharePopover } from '@/components/notes/SharePopover';
 import { NoteLinkPreview } from '@/components/desktop/NoteLinkPreview';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,6 +34,9 @@ interface EditorPanelProps {
   onAddTag: (tagId: string) => void;
   onRemoveTag: (tagId: string) => void;
   onCreateTag: (name: string, color: string) => Promise<Tag | null>;
+  isPublic?: boolean;
+  onTogglePublic?: (id?: string) => void;
+  linkedNotesData?: Note[];
   defaultMode?: EditorMode;
   onModeChange?: (mode: EditorMode) => void;
 }
@@ -48,6 +52,9 @@ export const EditorPanel = ({
   onAddTag,
   onRemoveTag,
   onCreateTag,
+  isPublic = false,
+  onTogglePublic,
+  linkedNotesData = [],
   defaultMode = 'edit',
   onModeChange,
 }: EditorPanelProps) => {
@@ -183,6 +190,16 @@ export const EditorPanel = ({
             </TooltipTrigger>
             <TooltipContent>Exportar Markdown</TooltipContent>
           </Tooltip>
+
+          {onTogglePublic && (
+            <SharePopover
+              noteId={note.id}
+              isPublic={isPublic}
+              onTogglePublic={onTogglePublic}
+              linkedNotesData={linkedNotesData}
+              compact
+            />
+          )}
 
           <Tooltip>
             <TooltipTrigger asChild>
