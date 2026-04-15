@@ -13,7 +13,7 @@ dist-ssr
 *.local
 
 # Gemini CLI
-./docs
+docs/
 
 # Editor directories and files
 .vscode/*
