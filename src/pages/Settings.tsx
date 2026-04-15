@@ -199,7 +199,7 @@ const Settings = () => {
 
             <Separator />
 
-            {!(isMobile || isMediumScreen) && (
+            {!isMobile && (
               <>
                 <div className="flex items-center justify-between">
                   <div>
@@ -225,28 +225,32 @@ const Settings = () => {
 
                 <Separator />
 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm">Layout da Barra Lateral</p>
-                    <p className="text-sm text-muted-foreground mr-4">
-                      Como dividir o espaço em telas grandes
-                    </p>
-                  </div>
-                  <Select 
-                    value={preferences.sidebarLayout} 
-                    onValueChange={(value: 'split' | 'unified') => updatePreferences({ sidebarLayout: value })}
-                  >
-                    <SelectTrigger className="w-[160px] rounded-xl h-9">
-                      <SelectValue placeholder="Selecione..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="split">Separado</SelectItem>
-                      <SelectItem value="unified">Unificado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {!isMediumScreen && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-sm">Layout da Barra Lateral</p>
+                        <p className="text-sm text-muted-foreground mr-4">
+                          Como dividir o espaço em telas grandes
+                        </p>
+                      </div>
+                      <Select 
+                        value={preferences.sidebarLayout} 
+                        onValueChange={(value: 'split' | 'unified') => updatePreferences({ sidebarLayout: value })}
+                      >
+                        <SelectTrigger className="w-[160px] rounded-xl h-9">
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="split">Separado</SelectItem>
+                          <SelectItem value="unified">Unificado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                <Separator />
+                    <Separator />
+                  </>
+                )}
               </>
             )}
 
