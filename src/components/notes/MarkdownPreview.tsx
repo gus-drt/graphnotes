@@ -3,24 +3,26 @@ import { useMemo } from 'react';
 interface MarkdownPreviewProps {
   content: string;
   onLinkClick?: (title: string) => void;
+  onTaskToggle?: (taskIndex: number, checked: boolean) => void;
   isPublicView?: boolean;
   publicLinkedNotes?: { title: string; id: string }[];
 }
 
-export const MarkdownPreview = ({ content, onLinkClick, isPublicView, publicLinkedNotes }: MarkdownPreviewProps) => {
+export const MarkdownPreview = ({ content, onLinkClick, onTaskToggle, isPublicView, publicLinkedNotes }: MarkdownPreviewProps) => {
   const html = useMemo(() => {
     // Split content into lines for better block-level handling
     const lines = content.split('\n');
     const processedLines: string[] = [];
-    let inList = false;
-    let listItems: string[] = [];
+    let listItems: { html: string; isTask: boolean }[] = [];
+    let taskIndex = 0;
 
     const flushList = () => {
       if (listItems.length > 0) {
-        processedLines.push(`<ul>${listItems.join('')}</ul>`);
+        const hasTaskItems = listItems.some(item => item.isTask);
+        const listClass = hasTaskItems ? ' class="task-list"' : '';
+        processedLines.push(`<ul${listClass}>${listItems.map(item => item.html).join('')}</ul>`);
         listItems = [];
       }
-      inList = false;
     };
 
     const processInline = (text: string) => {
@@ -95,18 +97,40 @@ export const MarkdownPreview = ({ content, onLinkClick, isPublicView, publicLink
         continue;
       }
 
+      // Task list items (- [ ] or - [x], also supports ordered list prefixes)
+      const taskListMatch = trimmedLine.match(/^(?:[-*]|\d+\.)\s+\[([ xX])\]\s+(.+)$/);
+      if (taskListMatch) {
+        const checked = taskListMatch[1].toLowerCase() === 'x';
+        const contentHtml = processInline(taskListMatch[2]);
+        const interactive = !!onTaskToggle && !isPublicView;
+        const attributes = [
+          `class="markdown-task-checkbox"`,
+          `data-task-index="${taskIndex}"`,
+          'type="checkbox"',
+          checked ? 'checked' : '',
+          interactive ? '' : 'disabled',
+        ]
+          .filter(Boolean)
+          .join(' ');
+
+        listItems.push({
+          isTask: true,
+          html: `<li class="task-list-item"><label class="task-list-label"><input ${attributes} /><span>${contentHtml}</span></label></li>`,
+        });
+        taskIndex += 1;
+        continue;
+      }
+
       // Unordered list items
       if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
-        inList = true;
-        listItems.push(`<li>${processInline(trimmedLine.slice(2))}</li>`);
+        listItems.push({ html: `<li>${processInline(trimmedLine.slice(2))}</li>`, isTask: false });
         continue;
       }
 
       // Ordered list items
       const orderedMatch = trimmedLine.match(/^\d+\.\s(.+)$/);
       if (orderedMatch) {
-        inList = true;
-        listItems.push(`<li>${processInline(orderedMatch[1])}</li>`);
+        listItems.push({ html: `<li>${processInline(orderedMatch[1])}</li>`, isTask: false });
         continue;
       }
 
@@ -118,7 +142,19 @@ export const MarkdownPreview = ({ content, onLinkClick, isPublicView, publicLink
     flushList();
 
     return processedLines.join('');
-  }, [content, isPublicView, publicLinkedNotes]);
+  }, [content, isPublicView, onTaskToggle, publicLinkedNotes]);
+
+  const handleTaskChange = (e: React.FormEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (!target.classList.contains('markdown-task-checkbox')) return;
+    if (!onTaskToggle || isPublicView) return;
+
+    const input = target as HTMLInputElement;
+    const taskIndex = Number(input.getAttribute('data-task-index'));
+    if (!Number.isNaN(taskIndex)) {
+      onTaskToggle(taskIndex, input.checked);
+    }
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -134,6 +170,7 @@ export const MarkdownPreview = ({ content, onLinkClick, isPublicView, publicLink
     <div 
       className="markdown-preview prose prose-sm max-w-none"
       onClick={handleClick}
+      onChange={handleTaskChange}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
