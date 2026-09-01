@@ -24,6 +24,7 @@ Esta aplicação foi construída para permitir que as ideias se conectem organic
 
 * **Visualização em Grafo:** Interface interativa com pan/zoom, centralização automática no nó índice e layout responsivo para mobile.
 * **Editor Markdown:** Escreva notas ricas com suporte nativo a Markdown e pré-visualização em tempo real.
+* **Checklist com Checkboxes:** Crie tarefas com `- [ ]` e marque como concluídas com `- [x]`, inclusive alternando direto na visualização.
 * **Pensamento Bidirecional:** Conecte notas através de links internos `[[Nome da Nota]]` e navegue entre elas com um clique.
 * **Sistema de Tags:** Crie e gerencie tags coloridas para organizar suas notas; compatível com armazenamento local e na nuvem.
 * **Fixar Notas:** Destaque notas importantes fixando-as no topo da lista.

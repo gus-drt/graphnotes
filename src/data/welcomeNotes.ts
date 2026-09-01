@@ -110,6 +110,10 @@ Lista numerada:
 1. \`1. primeiro\`
 2. \`2. segundo\`
 
+Checklist:
+- \`- [ ] tarefa pendente\`
+- \`- [x] tarefa concluída\`
+
 ## Outros
 
 - \`---\` → Linha horizontal

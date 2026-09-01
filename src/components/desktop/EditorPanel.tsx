@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { formatShortcut } from '@/hooks/useKeyboardShortcuts';
+import { toggleTaskCheckboxInMarkdown } from '@/lib/markdownTasks';
 import {
   Eye,
   Edit3,
@@ -113,6 +114,13 @@ export const EditorPanel = ({
     }
   }, [localContent, note.id, onUpdate]);
 
+  const handleTaskToggle = useCallback((taskIndex: number, checked: boolean) => {
+    const newContent = toggleTaskCheckboxInMarkdown(localContent, taskIndex, checked);
+    if (newContent === localContent) return;
+    setLocalContent(newContent);
+    onUpdate(note.id, { content: newContent });
+  }, [localContent, note.id, onUpdate]);
+
   const wordCount = localContent.split(/\s+/).filter(Boolean).length;
   const charCount = localContent.length;
 
@@ -123,13 +131,21 @@ export const EditorPanel = ({
       onChange={handleContentChange}
       onKeyDown={handleKeyDown}
       className="w-full h-full bg-transparent font-mono text-sm resize-none focus:outline-none p-4 leading-relaxed"
-      placeholder="Escreva sua nota aqui..."
+      placeholder={`Escreva sua nota aqui...
+
+Dicas:
+- [ ] tarefa
+- [x] concluída`}
     />
   );
 
   const previewContent = (
     <div ref={previewContainerRef} className="p-4 h-full overflow-auto">
-      <MarkdownPreview content={localContent} onLinkClick={onLinkClick} />
+      <MarkdownPreview
+        content={localContent}
+        onLinkClick={onLinkClick}
+        onTaskToggle={handleTaskToggle}
+      />
       {notes.length > 0 && (
         <NoteLinkPreview
           notes={notes}

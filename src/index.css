@@ -236,6 +236,26 @@ All colors MUST be HSL.
   @apply leading-normal;
 }
 
+.markdown-preview .task-list {
+  @apply list-none pl-0;
+}
+
+.markdown-preview .task-list-item {
+  @apply list-none;
+}
+
+.markdown-preview .task-list-label {
+  @apply inline-flex items-start gap-2 cursor-pointer;
+}
+
+.markdown-preview .markdown-task-checkbox {
+  @apply mt-1 h-4 w-4 accent-primary;
+}
+
+.markdown-preview .markdown-task-checkbox:disabled {
+  @apply cursor-default opacity-80;
+}
+
 .markdown-preview blockquote {
   @apply border-l-4 border-border pl-4 italic text-muted-foreground mb-4 rounded-r;
 }

@@ -6,6 +6,7 @@ import { TagSelector } from './TagSelector';
 import { SharePopover } from './SharePopover';
 import { Button } from '@/components/ui/button';
 import { Eye, Edit3, Trash2, ArrowLeft, Download } from 'lucide-react';
+import { toggleTaskCheckboxInMarkdown } from '@/lib/markdownTasks';
 
 interface NoteEditorProps {
   note: Note;
@@ -87,6 +88,13 @@ export const NoteEditor = ({ note, onUpdate, onDelete, onLinkClick, onBackToGrap
         textarea.selectionStart = textarea.selectionEnd = start + 2;
       });
     }
+  }, [localContent, note.id, onUpdate]);
+
+  const handleTaskToggle = useCallback((taskIndex: number, checked: boolean) => {
+    const newContent = toggleTaskCheckboxInMarkdown(localContent, taskIndex, checked);
+    if (newContent === localContent) return;
+    setLocalContent(newContent);
+    onUpdate(note.id, { content: newContent });
   }, [localContent, note.id, onUpdate]);
 
   return (
@@ -185,10 +193,16 @@ Dicas de formatação:
 **negrito**
 *itálico*
 - lista
+- [ ] tarefa
+- [x] tarefa concluída
 [[link para nota]]`}
           />
         ) : (
-          <MarkdownPreview content={localContent} onLinkClick={onLinkClick} />
+          <MarkdownPreview
+            content={localContent}
+            onLinkClick={onLinkClick}
+            onTaskToggle={handleTaskToggle}
+          />
         )}
       </div>
 
