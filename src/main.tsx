@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "next-themes";
 import React, { Suspense } from "react";
 import "./index.css";
+import "katex/dist/katex.min.css";
 
 const App = React.lazy(() => import("./App.tsx"));
 

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import katex from 'katex';
 
 interface MarkdownPreviewProps {
   content: string;
@@ -8,147 +9,239 @@ interface MarkdownPreviewProps {
   publicLinkedNotes?: { title: string; id: string }[];
 }
 
-export const MarkdownPreview = ({ content, onLinkClick, onTaskToggle, isPublicView, publicLinkedNotes }: MarkdownPreviewProps) => {
-  const html = useMemo(() => {
-    // Split content into lines for better block-level handling
-    const lines = content.split('\n');
-    const processedLines: string[] = [];
-    let listItems: { html: string; isTask: boolean }[] = [];
-    let taskIndex = 0;
+interface MarkdownRenderOptions {
+  onTaskToggle?: (taskIndex: number, checked: boolean) => void;
+  isPublicView?: boolean;
+  publicLinkedNotes?: { title: string; id: string }[];
+}
 
-    const flushList = () => {
-      if (listItems.length > 0) {
-        const hasTaskItems = listItems.some(item => item.isTask);
-        const listClass = hasTaskItems ? ' class="task-list"' : '';
-        processedLines.push(`<ul${listClass}>${listItems.map(item => item.html).join('')}</ul>`);
-        listItems = [];
-      }
-    };
+const MATH_PLACEHOLDER_PREFIX = '@@GNMATH';
 
-    const processInline = (text: string) => {
-      return text
-        // Escape HTML
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        // Note links [[title]]
-        .replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
-          if (isPublicView) {
-            const linkedNote = publicLinkedNotes?.find(n => n.title === title);
-            if (linkedNote) {
-              return `<a href="/s/${linkedNote.id}" class="text-primary hover:underline font-medium inline-flex items-center hover:bg-primary/5 px-1 rounded transition-colors">${title}</a>`;
-            }
-            return `<span class="text-muted-foreground cursor-not-allowed opacity-70 border border-border/50 bg-muted/20 px-1.5 py-0.5 rounded inline-flex items-center gap-1 text-[0.9em]" title="Nota privada"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-60"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>${title}</span>`;
+const escapeHtml = (text: string) =>
+  text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+const renderMathExpression = (expression: string, displayMode: boolean) =>
+  katex.renderToString(expression.trim(), {
+    throwOnError: false,
+    displayMode,
+    strict: 'ignore',
+  });
+
+const replaceMathWithPlaceholders = (text: string) => {
+  const mathTokens: Array<{ key: string; html: string }> = [];
+
+  const withPlaceholders = text.replace(/\$\$([\s\S]+?)\$\$|\$([^\n$]+?)\$/g, (_, blockExpression, inlineExpression) => {
+    const expression = (blockExpression ?? inlineExpression ?? '').trim();
+    const displayMode = typeof blockExpression === 'string';
+
+    if (!expression) return _;
+
+    const key = `${MATH_PLACEHOLDER_PREFIX}${mathTokens.length}@@`;
+    mathTokens.push({
+      key,
+      html: renderMathExpression(expression, displayMode),
+    });
+    return key;
+  });
+
+  return { withPlaceholders, mathTokens };
+};
+
+export const renderMarkdownToHtml = (content: string, { isPublicView, onTaskToggle, publicLinkedNotes }: MarkdownRenderOptions = {}) => {
+  // Split content into lines for better block-level handling
+  const lines = content.split('\n');
+  const processedLines: string[] = [];
+  let listItems: { html: string; isTask: boolean }[] = [];
+  let taskIndex = 0;
+  let isInsideMathBlock = false;
+  let mathBlockLines: string[] = [];
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      const hasTaskItems = listItems.some(item => item.isTask);
+      const listClass = hasTaskItems ? ' class="task-list"' : '';
+      processedLines.push(`<ul${listClass}>${listItems.map(item => item.html).join('')}</ul>`);
+      listItems = [];
+    }
+  };
+
+  const processInline = (text: string) => {
+    const { withPlaceholders, mathTokens } = replaceMathWithPlaceholders(text);
+
+    let inlineHtml = escapeHtml(withPlaceholders)
+      // Note links [[title]]
+      .replace(/\[\[([^\]]+)\]\]/g, (_, title) => {
+        if (isPublicView) {
+          const linkedNote = publicLinkedNotes?.find(n => n.title === title);
+          if (linkedNote) {
+            return `<a href="/s/${linkedNote.id}" class="text-primary hover:underline font-medium inline-flex items-center hover:bg-primary/5 px-1 rounded transition-colors">${title}</a>`;
           }
-          return `<span class="note-link cursor-pointer text-primary bg-primary/5 hover:bg-primary/10 px-1 rounded transition-colors" data-link="${title}">${title}</span>`;
-        })
-        // Bold and italic
-        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/___(.+?)___/g, '<strong><em>$1</em></strong>')
-        .replace(/__(.+?)__/g, '<strong>$1</strong>')
-        .replace(/_(.+?)_/g, '<em>$1</em>')
-        // Strikethrough
-        .replace(/~~(.+?)~~/g, '<del>$1</del>')
-        // Inline code
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        // Links
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
-          const isInternal = url.startsWith('/') || url.startsWith(window.location.origin);
-          if (isInternal) {
-            return `<a href="${url}">${text}</a>`;
-          }
-          return `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-        });
-    };
+          return `<span class="text-muted-foreground cursor-not-allowed opacity-70 border border-border/50 bg-muted/20 px-1.5 py-0.5 rounded inline-flex items-center gap-1 text-[0.9em]" title="Nota privada"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-60"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>${title}</span>`;
+        }
+        return `<span class="note-link cursor-pointer text-primary bg-primary/5 hover:bg-primary/10 px-1 rounded transition-colors" data-link="${title}">${title}</span>`;
+      })
+      // Bold and italic
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/___(.+?)___/g, '<strong><em>$1</em></strong>')
+      .replace(/__(.+?)__/g, '<strong>$1</strong>')
+      .replace(/_(.+?)_/g, '<em>$1</em>')
+      // Underline
+      .replace(/\+\+(.+?)\+\+/g, '<u>$1</u>')
+      // Strikethrough
+      .replace(/~~(.+?)~~/g, '<del>$1</del>')
+      // Inline code
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, textPart, url) => {
+        const isInternal = url.startsWith('/') || url.startsWith(window.location.origin);
+        if (isInternal) {
+          return `<a href="${url}">${textPart}</a>`;
+        }
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${textPart}</a>`;
+      });
 
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-
-      // Empty line - flush list and add break
-      if (trimmedLine === '') {
-        flushList();
-        continue;
-      }
-
-      // Headers
-      if (trimmedLine.startsWith('### ')) {
-        flushList();
-        processedLines.push(`<h3>${processInline(trimmedLine.slice(4))}</h3>`);
-        continue;
-      }
-      if (trimmedLine.startsWith('## ')) {
-        flushList();
-        processedLines.push(`<h2>${processInline(trimmedLine.slice(3))}</h2>`);
-        continue;
-      }
-      if (trimmedLine.startsWith('# ')) {
-        flushList();
-        processedLines.push(`<h1>${processInline(trimmedLine.slice(2))}</h1>`);
-        continue;
-      }
-
-      // Horizontal rule
-      if (trimmedLine === '---') {
-        flushList();
-        processedLines.push('<hr />');
-        continue;
-      }
-
-      // Blockquote
-      if (trimmedLine.startsWith('> ')) {
-        flushList();
-        processedLines.push(`<blockquote>${processInline(trimmedLine.slice(2))}</blockquote>`);
-        continue;
-      }
-
-      // Task list items (- [ ] or - [x], also supports ordered list prefixes)
-      const taskListMatch = trimmedLine.match(/^(?:[-*]|\d+\.)\s+\[([ xX])\]\s+(.+)$/);
-      if (taskListMatch) {
-        const checked = taskListMatch[1].toLowerCase() === 'x';
-        const contentHtml = processInline(taskListMatch[2]);
-        const interactive = !!onTaskToggle && !isPublicView;
-        const attributes = [
-          `class="markdown-task-checkbox"`,
-          `data-task-index="${taskIndex}"`,
-          'type="checkbox"',
-          checked ? 'checked' : '',
-          interactive ? '' : 'disabled',
-        ]
-          .filter(Boolean)
-          .join(' ');
-
-        listItems.push({
-          isTask: true,
-          html: `<li class="task-list-item"><label class="task-list-label"><input ${attributes} /><span>${contentHtml}</span></label></li>`,
-        });
-        taskIndex += 1;
-        continue;
-      }
-
-      // Unordered list items
-      if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
-        listItems.push({ html: `<li>${processInline(trimmedLine.slice(2))}</li>`, isTask: false });
-        continue;
-      }
-
-      // Ordered list items
-      const orderedMatch = trimmedLine.match(/^\d+\.\s(.+)$/);
-      if (orderedMatch) {
-        listItems.push({ html: `<li>${processInline(orderedMatch[1])}</li>`, isTask: false });
-        continue;
-      }
-
-      // Regular paragraph
-      flushList();
-      processedLines.push(`<p>${processInline(trimmedLine)}</p>`);
+    for (const token of mathTokens) {
+      inlineHtml = inlineHtml.replace(token.key, token.html);
     }
 
-    flushList();
+    return inlineHtml;
+  };
 
-    return processedLines.join('');
-  }, [content, isPublicView, onTaskToggle, publicLinkedNotes]);
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+
+    if (isInsideMathBlock) {
+      if (trimmedLine === '$$') {
+        const expression = mathBlockLines.join('\n').trim();
+        if (expression) {
+          flushList();
+          processedLines.push(renderMathExpression(expression, true));
+        }
+        mathBlockLines = [];
+        isInsideMathBlock = false;
+      } else {
+        mathBlockLines.push(line);
+      }
+      continue;
+    }
+
+    // Empty line - flush list and add break
+    if (trimmedLine === '') {
+      flushList();
+      continue;
+    }
+
+    // Display math block on a single line
+    if (trimmedLine.startsWith('$$') && trimmedLine.endsWith('$$') && trimmedLine.length > 4) {
+      flushList();
+      const expression = trimmedLine.slice(2, -2).trim();
+      if (expression) {
+        processedLines.push(renderMathExpression(expression, true));
+      }
+      continue;
+    }
+
+    // Display math block across multiple lines
+    if (trimmedLine === '$$') {
+      flushList();
+      isInsideMathBlock = true;
+      mathBlockLines = [];
+      continue;
+    }
+
+    // Headers
+    if (trimmedLine.startsWith('### ')) {
+      flushList();
+      processedLines.push(`<h3>${processInline(trimmedLine.slice(4))}</h3>`);
+      continue;
+    }
+    if (trimmedLine.startsWith('## ')) {
+      flushList();
+      processedLines.push(`<h2>${processInline(trimmedLine.slice(3))}</h2>`);
+      continue;
+    }
+    if (trimmedLine.startsWith('# ')) {
+      flushList();
+      processedLines.push(`<h1>${processInline(trimmedLine.slice(2))}</h1>`);
+      continue;
+    }
+
+    // Horizontal rule
+    if (trimmedLine === '---') {
+      flushList();
+      processedLines.push('<hr />');
+      continue;
+    }
+
+    // Blockquote
+    if (trimmedLine.startsWith('> ')) {
+      flushList();
+      processedLines.push(`<blockquote>${processInline(trimmedLine.slice(2))}</blockquote>`);
+      continue;
+    }
+
+    // Task list items (- [ ] or - [x], also supports ordered list prefixes)
+    const taskListMatch = trimmedLine.match(/^(?:[-*]|\d+\.)\s+\[([ xX])\]\s+(.+)$/);
+    if (taskListMatch) {
+      const checked = taskListMatch[1].toLowerCase() === 'x';
+      const contentHtml = processInline(taskListMatch[2]);
+      const interactive = !!onTaskToggle && !isPublicView;
+      const attributes = [
+        `class="markdown-task-checkbox"`,
+        `data-task-index="${taskIndex}"`,
+        'type="checkbox"',
+        checked ? 'checked' : '',
+        interactive ? '' : 'disabled',
+      ]
+        .filter(Boolean)
+        .join(' ');
+
+      listItems.push({
+        isTask: true,
+        html: `<li class="task-list-item"><label class="task-list-label"><input ${attributes} /><span>${contentHtml}</span></label></li>`,
+      });
+      taskIndex += 1;
+      continue;
+    }
+
+    // Unordered list items
+    if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
+      listItems.push({ html: `<li>${processInline(trimmedLine.slice(2))}</li>`, isTask: false });
+      continue;
+    }
+
+    // Ordered list items
+    const orderedMatch = trimmedLine.match(/^\d+\.\s(.+)$/);
+    if (orderedMatch) {
+      listItems.push({ html: `<li>${processInline(orderedMatch[1])}</li>`, isTask: false });
+      continue;
+    }
+
+    // Regular paragraph
+    flushList();
+    processedLines.push(`<p>${processInline(trimmedLine)}</p>`);
+  }
+
+  if (isInsideMathBlock && mathBlockLines.length > 0) {
+    flushList();
+    processedLines.push(`<p>${processInline(`$$\n${mathBlockLines.join('\n')}`)}</p>`);
+  }
+
+  flushList();
+
+  return processedLines.join('');
+};
+
+export const MarkdownPreview = ({ content, onLinkClick, onTaskToggle, isPublicView, publicLinkedNotes }: MarkdownPreviewProps) => {
+  const html = useMemo(
+    () => renderMarkdownToHtml(content, { isPublicView, onTaskToggle, publicLinkedNotes }),
+    [content, isPublicView, onTaskToggle, publicLinkedNotes]
+  );
 
   const handleTaskChange = (e: React.FormEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;

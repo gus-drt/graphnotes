@@ -5,7 +5,7 @@ import { NoteEditor } from '@/components/notes/NoteEditor';
 import { NoteGraph } from '@/components/notes/NoteGraph';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Menu, Network, FileText, Plus, Settings, CloudOff, RefreshCw, Cloud } from 'lucide-react';
+import { Menu, Network, FileText, Plus, Settings, CloudOff, RefreshCw, Cloud, Sigma } from 'lucide-react';
 import { Note, NoteLink } from '@/types/note';
 import { Tag } from '@/hooks/useTags';
 
@@ -250,6 +250,16 @@ export const MobileLayout = ({
             >
               <Settings className="w-5 h-5" />
             </Button>
+
+            {/* Formatting Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/formatting')}
+              className="h-12 w-12 rounded-xl hover:bg-accent"
+            >
+              <Sigma className="w-5 h-5" />
+            </Button>
           </div>
 
           {/* Stats indicator */}
@@ -286,4 +296,3 @@ export const MobileLayout = ({
 };
 
 export default MobileLayout;
-

@@ -24,6 +24,7 @@ import {
   Download,
   Trash2,
   Clock,
+  Sigma,
 } from 'lucide-react';
 
 interface CommandPaletteProps {
@@ -122,6 +123,10 @@ export const CommandPalette = ({
             <Settings className="w-4 h-4 mr-2" />
             Configurações
             <CommandShortcut>{formatShortcut({ key: ',', ctrl: true })}</CommandShortcut>
+          </CommandItem>
+          <CommandItem onSelect={() => handleSelect(() => navigate('/formatting'))}>
+            <Sigma className="w-4 h-4 mr-2" />
+            Guia de Formatação
           </CommandItem>
         </CommandGroup>
 
