@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Settings from "./pages/Settings";
+import Formatting from "./pages/Formatting";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/formatting" element={<Formatting />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/s/:noteId"
@@ -52,4 +54,3 @@ const App = () => (
 );
 
 export default App;
-

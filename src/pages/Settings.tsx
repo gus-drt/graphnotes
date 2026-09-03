@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Trash2, Loader2, User, Shield, Palette, Sun, Moon, Lock, HardDrive, LogOut } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, User, Shield, Palette, Sun, Moon, Lock, HardDrive, LogOut, Sigma } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import { useLayoutPreferences } from '@/hooks/useLayoutPreferences';
@@ -115,6 +115,15 @@ const Settings = () => {
             <span className="hidden sm:inline ml-2">Voltar</span>
           </Button>
           <h1 className="text-lg font-semibold flex-1">Configurações</h1>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/formatting')}
+            className="rounded-xl gap-2"
+          >
+            <Sigma className="w-4 h-4" />
+            Formatação
+          </Button>
         </div>
       </header>
 

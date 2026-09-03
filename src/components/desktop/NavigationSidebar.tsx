@@ -23,6 +23,7 @@ import {
   Sparkles,
   Clock,
   Filter,
+  Sigma,
 } from 'lucide-react';
 
 interface NavigationSidebarProps {
@@ -290,6 +291,15 @@ export const NavigationSidebar = ({
         >
           <Settings className="w-4 h-4 mr-2" />
           Configurações
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start"
+          onClick={() => navigate('/formatting')}
+        >
+          <Sigma className="w-4 h-4 mr-2" />
+          Formatação
         </Button>
       </div>
     </div>
