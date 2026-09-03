@@ -121,6 +121,28 @@ export const EditorPanel = ({
     onUpdate(note.id, { content: newContent });
   }, [localContent, note.id, onUpdate]);
 
+  const insertFormula = useCallback((type: 'inline' | 'block') => {
+    const textarea = textareaRef.current;
+    const selectionStart = textarea?.selectionStart ?? localContent.length;
+    const selectionEnd = textarea?.selectionEnd ?? localContent.length;
+    const selectedText = localContent.slice(selectionStart, selectionEnd);
+    const formulaSnippet = type === 'inline'
+      ? `$${selectedText || 'x^2'}$`
+      : `$$\n${selectedText || 'x^2 + y^2 = z^2'}\n$$`;
+
+    const newContent = `${localContent.slice(0, selectionStart)}${formulaSnippet}${localContent.slice(selectionEnd)}`;
+    setLocalContent(newContent);
+    onUpdate(note.id, { content: newContent });
+
+    requestAnimationFrame(() => {
+      const input = textareaRef.current;
+      if (!input) return;
+      input.focus();
+      const cursorPosition = selectionStart + formulaSnippet.length;
+      input.setSelectionRange(cursorPosition, cursorPosition);
+    });
+  }, [localContent, note.id, onUpdate]);
+
   const wordCount = localContent.split(/\s+/).filter(Boolean).length;
   const charCount = localContent.length;
 
@@ -135,7 +157,12 @@ export const EditorPanel = ({
 
 Dicas:
 - [ ] tarefa
-- [x] concluída`}
+- [x] concluída
+- ++sublinhado++
+- $x^2$
+- $$
+x^2 + y^2 = z^2
+$$`}
     />
   );
 
@@ -205,6 +232,24 @@ Dicas:
               </Button>
             </TooltipTrigger>
             <TooltipContent>Exportar Markdown</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => insertFormula('inline')} className="h-8 px-2 text-xs">
+                $...$
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Inserir fórmula inline</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={() => insertFormula('block')} className="h-8 px-2 text-xs">
+                $$...$$
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Inserir fórmula em bloco</TooltipContent>
           </Tooltip>
 
           {onTogglePublic && (

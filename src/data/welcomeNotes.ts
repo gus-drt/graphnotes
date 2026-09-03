@@ -97,6 +97,7 @@ O Graph Notes suporta Markdown para formatar suas notas. Aqui está tudo que voc
 - \`**negrito**\` → **negrito**
 - \`*itálico*\` → *itálico*
 - \`***negrito e itálico***\` → ***negrito e itálico***
+- \`++sublinhado++\` → ++sublinhado++
 - \`~~riscado~~\` → ~~riscado~~
 - \`\\\`código inline\\\`\` → \`código inline\`
 
@@ -120,6 +121,16 @@ Checklist:
 - \`> texto\` → Citação (blockquote)
 - \`[texto](url)\` → Link externo
 - \`[[nome da nota]]\` → Link para outra nota
+
+## Fórmulas matemáticas (LaTeX)
+
+- Inline: \`$x^2 + y^2 = z^2$\`
+- Bloco:
+\`\`\`
+$$
+\\int_0^1 x^2\\,dx = \\frac{1}{3}
+$$
+\`\`\`
 
 ---
 
